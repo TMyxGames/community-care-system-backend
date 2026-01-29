@@ -13,6 +13,7 @@ public class Service {
     private String workTime;
     private String location;
     private BigDecimal price;
+    private int total;
     private String imgUrl;
     private String link;
 
@@ -90,6 +91,10 @@ public class Service {
         this.price = price;
     }
 
+    public int getTotal() { return total; }
+
+    public void setTotal(int total) { this.total = total; }
+
     public String getImgUrl() {
         return imgUrl;
     }
@@ -119,6 +124,7 @@ public class Service {
                 ", workTime='" + workTime + '\'' +
                 ", location='" + location + '\'' +
                 ", price='" + price + '\'' +
+                ", total='" + total + '\'' +
                 ", imgUrl='" + imgUrl + '\'' +
                 ", link='" + link + '\'' +
                 '}';

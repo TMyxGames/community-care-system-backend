@@ -2,6 +2,7 @@ package com.tmyx.backend.controller;
 
 import com.tmyx.backend.entity.Address;
 import com.tmyx.backend.mapper.AddressMapper;
+import com.tmyx.backend.service.AmapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +16,29 @@ public class AddressController {
     @Autowired
     private AddressMapper addressMapper;
 
+    @Autowired
+    private AmapService amapService;
+
     // 添加地址
     @PostMapping("/add")
     public String addAddress(@RequestBody Address address) {
-        System.out.println("准备存入数据库的对象: " + address.toString());
+        // 基本校验
         if (address.getUserId() == null || address.getArea() == null) {
             return "添加失败：用户信息或区域不能为空";
         }
+        // 将地址拼接起来获取经纬度
+        String fullAddress = address.getArea() + address.getDetail();
+        double[] coords = amapService.getCoordinate(fullAddress);
+        // 将解析到的经纬度设置到对象中
+        if (coords != null && coords.length == 2) {
+            address.setLng(coords[0]);
+            address.setLat(coords[1]);
+            System.out.println("经纬度: " + coords[0] + ", " + coords[1]);
+        } else {
+            System.out.println("无法解析地址");
+        }
 
         int result = addressMapper.insert(address);
-        System.out.println("数据库受影响行数: " + result);
         return result > 0 ? "添加成功" : "添加失败";
     }
 

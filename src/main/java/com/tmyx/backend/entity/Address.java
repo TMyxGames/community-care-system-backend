@@ -8,6 +8,10 @@ public class Address {
     private String area;
     private String detail;
     private Integer isDefault;
+    private Double lng;
+    private Double lat;
+    private String adcode;
+    private Boolean isVerified;
 
     public Integer getId() {
         return id;
@@ -65,6 +69,38 @@ public class Address {
         this.isDefault = isDefault;
     }
 
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public String getAdcode() {
+        return adcode;
+    }
+
+    public void setAdcode(String adcode) {
+        this.adcode = adcode;
+    }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
     @Override
     public String toString() {
         return "Address{" +
@@ -75,6 +111,10 @@ public class Address {
                 ", area='" + area + '\'' +
                 ", detail='" + detail + '\'' +
                 ", isDefault=" + isDefault +
+                ", lng=" + lng +
+                ", lat=" + lat +
+                ", adcode='" + adcode + '\'' +
+                ", isVerified=" + isVerified +
                 '}';
     }
 }

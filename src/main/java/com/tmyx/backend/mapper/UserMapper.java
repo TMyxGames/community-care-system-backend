@@ -30,8 +30,8 @@ public interface UserMapper {
     public List<User> findByRole(int role);
 
     // 插入用户
-    @Insert("insert into user(username, sex, password, email, avatar_url, role)" +
-            "values(#{username}, #{sex}, #{password}, #{email}, #{avatarUrl}, #{role})")
+    @Insert("insert into user(username, sex, password, email, avatar_url, role, service_status, service_area_id)" +
+            "values(#{username}, #{sex}, #{password}, #{email}, #{avatarUrl}, #{role}, #{serviceStatus}, #{serviceAreaId})")
     public int insert(User user);
 
     // 删除用户

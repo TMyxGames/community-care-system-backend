@@ -13,8 +13,8 @@ public interface AddressMapper {
     public List<Address> findByUserId(Integer userId);
 
     // 插入地址
-    @Insert("insert into address(user_id, contact, phone, area, detail)" +
-            "values(#{userId}, #{contact}, #{phone}, #{area}, #{detail})")
+    @Insert("insert into address(user_id, contact, phone, area, detail, lng, lat, adcode, is_verified)" +
+            "values(#{userId}, #{contact}, #{phone}, #{area}, #{detail}, #{lng}, #{lat}, #{adcode}, #{isVerified})")
     public int insert(Address address);
 
     // 更新地址
