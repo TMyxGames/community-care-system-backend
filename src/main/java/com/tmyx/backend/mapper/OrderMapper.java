@@ -12,10 +12,10 @@ public interface OrderMapper {
     // 创建订单
     @Insert("insert into `order`(order_sn, user_id, " +
             "service_id, service_title, service_img, service_price, " +
-            "address_id, address_shot, create_time, state, rate, comment) " +
+            "address_id, address_shot, create_time, scheduled_time, complete_time, state, rate, comment) " +
             "values (#{orderSn}, #{userId}, #{serviceId}, #{serviceTitle}, " +
             "#{serviceImg}, #{servicePrice}, #{addressId}, #{addressShot}, " +
-            "#{createTime}, #{state}, #{rate}, #{comment} )")
+            "#{createTime}, #{scheduledTime}, #{completeTime}, #{state}, #{rate}, #{comment} )")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insertOrder(Order order);
 

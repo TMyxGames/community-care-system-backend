@@ -2,7 +2,7 @@ package com.tmyx.backend.entity;
 
 public class ServiceArea {
     private Integer id;
-    private Integer staffId;
+    private Integer adminId;
     private String areaName;
     private String scopePath;
     private Double centerLng;
@@ -12,9 +12,9 @@ public class ServiceArea {
 
     public void setId(Integer id) { this.id = id; }
 
-    public Integer getStaffId() { return staffId; }
+    public Integer getAdminId() { return adminId; }
 
-    public void setStaffId(Integer staffId) { this.staffId = staffId; }
+    public void setAdminId(Integer adminId) { this.adminId = adminId; }
 
     public String getAreaName() { return areaName; }
 
@@ -36,7 +36,7 @@ public class ServiceArea {
     public String toString() {
         return "ServiceArea{" +
                 "id=" + id +
-                ", staffId=" + staffId +
+                ", adminId=" + adminId +
                 ", areaName='" + areaName + '\'' +
                 ", scopePath='" + scopePath + '\'' +
                 ", centerLng=" + centerLng +

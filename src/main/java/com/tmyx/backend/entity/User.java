@@ -3,6 +3,7 @@ package com.tmyx.backend.entity;
 public class User {
     private Integer id;
     private String username;
+    private String realName;
     private String sex;
     private String password;
     private String email;
@@ -24,6 +25,10 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getRealName() { return realName; }
+
+    public void setRealName(String realName) { this.realName = realName; }
 
     public String getSex() { return sex; }
 
@@ -62,6 +67,7 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
+                ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +

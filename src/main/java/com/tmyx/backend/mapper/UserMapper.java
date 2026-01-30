@@ -9,6 +9,7 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
+    // ============================== 查询 ==============================
     // 查询所有用户
     @Select("select * from user")
     public List<User> findAll();
@@ -21,6 +22,10 @@ public interface UserMapper {
     @Select("select * from user where username=#{username}")
     public User findByName(String username);
 
+    // 根据真实姓名查询用户
+    @Select("select * from user where real_name= #{realName}")
+    public User findByRealName(String realName);
+
     // 根据邮箱查询用户
     @Select("select * from user where email=#{email}")
     public User findByEmail(String email);
@@ -29,9 +34,18 @@ public interface UserMapper {
     @Select("select * from user where role=#{role}")
     public List<User> findByRole(int role);
 
+    // 查询所有管理员
+    @Select("select * from user where role=1")
+    public List<User> findAllAdmins();
+
+    // 查询所有服务人员
+    @Select("select * from user where role=2")
+    public List<User> findAllStaff();
+
+    // ============================== 用户 ==============================
     // 插入用户
-    @Insert("insert into user(username, sex, password, email, avatar_url, role, service_status, service_area_id)" +
-            "values(#{username}, #{sex}, #{password}, #{email}, #{avatarUrl}, #{role}, #{serviceStatus}, #{serviceAreaId})")
+    @Insert("insert into user(username, real_name, sex, password, email, avatar_url, role, service_status, service_area_id)" +
+            "values(#{username}, #{realName}, #{sex}, #{password}, #{email}, #{avatarUrl}, #{role}, #{serviceStatus}, #{serviceAreaId})")
     public int insert(User user);
 
     // 删除用户
@@ -39,7 +53,7 @@ public interface UserMapper {
     public int delete(int id);
 
     // 更新基础账户数据
-    @Update("update user set username=#{username}, sex=#{sex} where id = #{id}")
+    @Update("update user set username=#{username}, real_name=#{realName}, sex=#{sex} where id = #{id}")
     public int updateBaseInfo(User user);
 
     // 更新密码
@@ -71,4 +85,11 @@ public interface UserMapper {
     // 检查是否已存在绑定关系
     @Select("select count(*) from binding where follower_id = #{followerId} and elder_id = #{elderId}")
     int countBinding(@Param("followerId") int followerId, @Param("elderId") int elderId);
+
+    // ============================== 服务人员 ==============================
+    // 更新服务人员工作区域
+    @Update("update user set service_area_id= #{serviceAreaId} where id = #{id}")
+    public int updateServiceArea(User user);
+
+
 }

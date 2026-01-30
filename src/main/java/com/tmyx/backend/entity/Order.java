@@ -14,6 +14,8 @@ public class Order {
     private Integer addressId;
     private String addressShot;
     private LocalDateTime createTime;
+    private LocalDateTime scheduledTime;
+    private LocalDateTime completeTime;
     private Integer state;
     private Integer rate;
     private String comment;
@@ -58,6 +60,14 @@ public class Order {
 
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 
+    public LocalDateTime getScheduledTime() { return scheduledTime; }
+
+    public void setScheduledTime(LocalDateTime scheduledTime) { this.scheduledTime = scheduledTime; }
+
+    public LocalDateTime getCompleteTime() { return completeTime; }
+
+    public void setCompleteTime(LocalDateTime completeTime) { this.completeTime = completeTime; }
+
     public Integer getState() { return state; }
 
     public void setState(Integer state) { this.state = state; }
@@ -83,6 +93,8 @@ public class Order {
                 ", addressId=" + addressId +
                 ", addressShot='" + addressShot + '\'' +
                 ", createTime=" + createTime +
+                ", scheduledTime=" + scheduledTime +
+                ", completeTime=" + completeTime +
                 ", state=" + state +
                 ", rate=" + rate +
                 ", comment='" + comment + '\'' +
