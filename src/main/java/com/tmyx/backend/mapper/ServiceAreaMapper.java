@@ -17,6 +17,10 @@ public interface ServiceAreaMapper {
     @Select("select * from service_area")
     public List<ServiceArea> findAll();
 
+    // 根据id查询服务区域
+    @Select("select * from service_area where id= #{id}")
+    public ServiceArea findById(Integer id);
+
     // 更新服务区域信息
     @Update("update service_area set area_name=#{areaName}, scope_path=#{scopePath}, " +
             "center_lng=#{centerLng}, center_lat=#{centerLat} where id=#{id}")

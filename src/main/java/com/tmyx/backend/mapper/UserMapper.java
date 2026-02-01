@@ -87,9 +87,10 @@ public interface UserMapper {
     int countBinding(@Param("followerId") int followerId, @Param("elderId") int elderId);
 
     // ============================== 服务人员 ==============================
-    // 更新服务人员工作区域
-    @Update("update user set service_area_id= #{serviceAreaId} where id = #{id}")
-    public int updateServiceArea(User user);
+    // 更新服务人员工作区域（参数来自UserService）
+    // service_area_id 接收的参数areaId来自StaffConfigDto接收的前端参数
+    @Update("update user set service_area_id= #{areaId} where id = #{userId}")
+    public int updateServiceArea(@Param("userId") Integer userId, @Param("areaId") Integer areaId);
 
 
 }

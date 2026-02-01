@@ -1,5 +1,9 @@
 package com.tmyx.backend.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
+import java.util.List;
+
 public class User {
     private Integer id;
     private String username;
@@ -9,8 +13,12 @@ public class User {
     private String email;
     private String avatarUrl;
     private Integer role; // 0: 用户, 1: 管理员, 2: 服务人员
-    private Integer serviceStatus;
+    private Integer serviceStatus; // 0: 离线, 1: 空闲中, 2: 活动中
     private Integer serviceAreaId;
+
+    @TableField(exist = false)
+    private String areaName;
+    private List<Integer> serviceIds;
 
     public Integer getId() { return id; }
 
@@ -61,6 +69,14 @@ public class User {
     public Integer getServiceAreaId() { return serviceAreaId; }
 
     public void setServiceAreaId(Integer serviceAreaId) { this.serviceAreaId = serviceAreaId; }
+
+    public String getAreaName() { return areaName; }
+
+    public void setAreaName(String areaName) { this.areaName = areaName; }
+
+    public List<Integer> getServiceIds() { return serviceIds; }
+
+    public void setServiceIds(List<Integer> serviceIds) { this.serviceIds = serviceIds; }
 
     @Override
     public String toString() {
