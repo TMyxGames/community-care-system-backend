@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.tmyx.backend.util.Result;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,13 @@ public class UserController {
     @GetMapping("/all")
     public List<User> getAllUsers() {
         return userMapper.findAll();
+    }
+
+    // 根据关键词搜索用户（id、用户名、真实姓名)
+    @GetMapping("/search")
+    public Result search(@RequestParam String keyword, @RequestParam Integer userId) {
+        List<User> users = userService.searchUsers(keyword, userId);
+        return Result.success(users);
     }
 
     // 获取所有服务人员

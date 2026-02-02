@@ -42,6 +42,15 @@ public interface UserMapper {
     @Select("select * from user where role=2")
     public List<User> findAllStaff();
 
+    // 根据关键词搜索用户（id、用户名、真实姓名)
+    // 该方法来自UserMapper.xml
+    List<User> searchUsers(@Param("keyword") String keyword, @Param("currentUserId") Integer currentUserId );
+
+    // ============================== 更新 ==============================
+    // 更新位置
+    @Update("update user set lng=#{lng}, lat=#{lat} where id=#{id}")
+    public int updateLocation(@Param("id") Integer id, @Param("lng") Double lng, @Param("lat") Double lat);
+
     // ============================== 用户 ==============================
     // 插入用户
     @Insert("insert into user(username, real_name, sex, password, email, avatar_url, role, service_status, service_area_id)" +
