@@ -20,12 +20,13 @@ public class MessageController {
     private MessageService messageService;
 
     // 获取系统消息列表（0：系统消息）
-    @GetMapping("/all/0")
-    public List<Message> getSysMsgList() {
-        return messageMapper.findAllSysMsg();
-    }
+//    @GetMapping("/all/{type}")
+//    public Result getMsgList(@PathVariable Integer type, @RequestAttribute Integer userId) {
+//        List<Message> messages = messageService.getMsgByType(type, userId);
+//        return Result.success(messages);
+//    }
 
-    // 获取绑定请求列表（1：绑定请求）
+    // 获取当前用户的绑定请求列表（1：绑定请求）
     @GetMapping("/all/1")
     public List<Message> getBindMsgList() {
         return messageMapper.findAllBindMsg();

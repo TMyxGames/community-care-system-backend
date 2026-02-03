@@ -1,5 +1,7 @@
 package com.tmyx.backend.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.util.Date;
 
 public class Message {
@@ -10,6 +12,11 @@ public class Message {
     private Integer status; // 0: 未处理 1: 已同意 2: 已拒绝 该字段仅在用户绑定请求中使用
     private String contentUrl; // 该字段仅在系统消息中使用
     private Date sendTime;
+
+    @TableField(exist = false)
+    private User fromUser;
+    @TableField(exist = false)
+    private User toUser;
 
     public Integer getId() {
         return id;
@@ -65,6 +72,22 @@ public class Message {
 
     public void setSendTime(Date sendTime) {
         this.sendTime = sendTime;
+    }
+
+    public User getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
+    }
+
+    public User getToUser() {
+        return toUser;
+    }
+
+    public void setToUser(User toUser) {
+        this.toUser = toUser;
     }
 
     @Override

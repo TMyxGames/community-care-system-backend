@@ -12,7 +12,12 @@ public class MessageService {
     @Autowired
     private MessageMapper messageMapper;
 
+    // 根据类型获取消息
+//    public Message[] getMsgByType(Integer type) {
+//
+//    }
 
+    // 发送绑定请求
     public void sendBindingRequest(Integer fromId, Integer toId) {
         if (fromId.equals(toId)) {
             throw new RuntimeException("不能绑定自己");
