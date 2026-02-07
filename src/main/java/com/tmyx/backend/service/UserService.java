@@ -3,6 +3,7 @@ package com.tmyx.backend.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmyx.backend.entity.StaffConfigDto;
 import com.tmyx.backend.entity.User;
+import com.tmyx.backend.entity.UserBindDto;
 import com.tmyx.backend.handler.LocationHandler;
 import com.tmyx.backend.mapper.ServiceAreaMapper;
 import com.tmyx.backend.mapper.StaffWorkMapper;
@@ -37,6 +38,23 @@ public class UserService {
         }
         return userMapper.searchUsers(keyword, currentUserId);
     }
+
+    // 查询绑定请求发送者的信息（用于接收方会话渲染）
+    public UserBindDto getUserBindDto(Integer userId) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            return null;
+        }
+
+        UserBindDto dto = new UserBindDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setRealName(user.getRealName());
+        dto.setAvatarUrl(user.getAvatarUrl());
+
+        return dto;
+    }
+
 
     // 获取带有服务的人员列表
     public List<User> getStaffList() {

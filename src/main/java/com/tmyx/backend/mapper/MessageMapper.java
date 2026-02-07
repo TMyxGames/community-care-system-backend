@@ -16,6 +16,7 @@ public interface MessageMapper {
     // 插入一条消息
     @Insert("insert into message(from_session_id, to_session_id, from_id, to_id, content, type, status, send_time) " +
             "values(#{fromSessionId}, #{toSessionId}, #{fromId}, #{toId}, #{content}, #{type}, #{status}, #{sendTime})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insert(Message message);
 
     // 根据id查询消息

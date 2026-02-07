@@ -2,6 +2,7 @@ package com.tmyx.backend.config;
 
 import com.tmyx.backend.handler.LocationHandler;
 import com.tmyx.backend.handler.MessageHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -16,7 +17,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(new LocationHandler(), "/ws/location")
                 .setAllowedOrigins("*");
 
-        registry.addHandler(new MessageHandler(), "/ws/message")
+        registry.addHandler(messageHandler(), "/ws/message")
                 .setAllowedOrigins("*");
+    }
+
+    @Bean
+    public MessageHandler messageHandler() {
+        return new MessageHandler();
     }
 }

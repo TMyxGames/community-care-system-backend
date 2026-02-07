@@ -13,39 +13,54 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class MessageHandler extends TextWebSocketHandler {
-    private static final Map<Integer, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Map<Integer, WebSocketSession> userSessions = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // 建立连接时将用户id与session进行绑定
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // 建立连接时从url中获取用户id
         Integer userId = getUserId(session);
         if (userId != null) {
-            sessions.put(userId, session);
+            userSessions.put(userId, session);
+            System.out.println("WebSocket 已连接: 用户ID = " + userId);
         }
     }
 
+    // 断开连接时移除session
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         Integer userId = getUserId(session);
-        if (userId != null) sessions.remove(userId);
+        if (userId != null) {
+            userSessions.remove(userId);
+            System.out.println("WebSocket 已断开: 用户ID = " + userId);
+        }
     }
 
-    // 提供一个静态方法给 Service 调用
-    public static void sendToUser(Integer userId, Object message) {
-        WebSocketSession session = sessions.get(userId);
+    // 提供一个方法给Service调用
+    public void sendMessageToUser(Integer userId, Object message) {
+        WebSocketSession session = userSessions.get(userId);
         if (session != null && session.isOpen()) {
             try {
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+                System.out.println("准备推送给用户: " + userId + "，当前在线用户集: " + userSessions.keySet());
+                String json = objectMapper.writeValueAsString(message);
+                session.sendMessage(new TextMessage(json));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    // 从连接url中获取用户id
     private Integer getUserId(WebSocketSession session) {
-        String query = session.getUri().getQuery();
-        // 简单的解析逻辑，实际建议从 Token 中解析
-        return Integer.parseInt(query.split("=")[1]);
+        try {
+            String query = session.getUri().getQuery();
+            if (query != null && query.contains("userId=")) {
+                return Integer.parseInt(query.split("userId=")[1]);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
     }
 }
