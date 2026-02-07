@@ -7,6 +7,8 @@ import com.tmyx.backend.entity.UserRegiDto;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
 import com.tmyx.backend.util.FileUtil;
+import com.tmyx.backend.util.JwtUtil;
+import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -40,113 +44,84 @@ public class AuthController {
 
     // 发送验证码
     @PostMapping("/sendCaptcha")
-    public ResponseEntity<?> sendCaptcha(@RequestParam String email) {
+    public Result sendCaptcha(@RequestParam String email) {
         // 生成验证码
         String captcha = String.valueOf((int) ((Math.random() * 9 + 1) * 100000));
-
+        // 保存验证码到redis
         redisTemplate.opsForValue().set("CAPTCHA:" + email, captcha, 5, TimeUnit.MINUTES);
         // 发送邮件
         mailService.sendCaptchaMail(email, captcha);
-        // 保存验证码到redis
-
-        return ResponseEntity.ok("验证码发送成功，5分钟内有效");
+        // 返回结果
+        return Result.success();
     }
 
     // 用户注册
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegiDto regiDto) {
+    public Result register(@RequestBody UserRegiDto regiDto) {
         String email = regiDto.getEmail();
         String userInputCode = regiDto.getCaptcha();
-
-        // 1. 从 Redis 中获取保存的验证码
+        // 从redis中获取保存的验证码
         String realCode = redisTemplate.opsForValue().get("CAPTCHA:" + email);
-
+        // 校验用户是否存在（未来封装到Service里）
         if (userMapper.findByName(regiDto.getUsername()) != null) {
-            return ResponseEntity.badRequest().body("用户名已存在");
+            return Result.error("用户名已存在");
         }
-
-        // 2. 校验
+        // 校验验证码是否有效
         if (realCode == null) {
-            return ResponseEntity.badRequest().body("验证码已失效，请重新获取");
+            return Result.error("验证码已失效，请重新获取");
         }
-
+        // 校验验证码是否正确
         if (!realCode.equals(userInputCode)) {
-            return ResponseEntity.badRequest().body("验证码错误");
+            return Result.error("验证码错误");
         }
-
-        // 3. 保存用户信息到数据库
+        // 保存用户信息到数据库
         User user = new User();
         user.setUsername(regiDto.getUsername());
         user.setPassword(regiDto.getPassword());
         user.setEmail(regiDto.getEmail());
         user.setRole(regiDto.getRole() != null ? regiDto.getRole() : 0);
         userMapper.insert(user);
-
-        // 4. 删除 Redis 中的验证码
+        // 删除 Redis 中的验证码
         redisTemplate.delete("CAPTCHA:" + email);
-
-        return ResponseEntity.ok("注册成功！");
+        // 返回结果
+        return Result.success();
     }
 
     // 用户登录
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginDto loginDto) {
+    public Result login(@RequestBody UserLoginDto loginDto) {
         User user = userMapper.findByEmail(loginDto.getEmail());
-
+        // 校验用户是否存在
         if (user == null) {
-            return ResponseEntity.status(401).body("用户不存在");
+            return Result.error(401, "用户不存在");
         }
-
+        // 校验密码
         if (!user.getPassword().equals(loginDto.getPassword())) {
-            return ResponseEntity.status(401).body("密码错误");
+            return Result.error(401, "密码错误");
         }
-
+        // 校验用户身份
         if (loginDto.getRole() != null) {
             int role = loginDto.getRole();
-
             if (role != 0 && !user.getRole().equals(role)) {
                 String roleName = role == 1 ? "管理员" : "服务人员";
-                return ResponseEntity.status(403).body("权限不足：该账号不是" + roleName);
+                return Result.error(403, "权限不足：该账号不是" + roleName);
             }
         }
-
-        // 登录成功后返回用户信息，不返回密码
+        // 登录成功，生成JWT Token
+        String token = JwtUtil.createToken(user.getId());
+        // 返回数据，不返回密码
         user.setPassword(null);
-        return ResponseEntity.ok(user);
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("token", token);
+        responseData.put("userInfo", user);
+        return Result.success(responseData);
     }
 
     // 获取绑定数据
     @GetMapping("/bindings")
-    public ResponseEntity<?> getBindings(@RequestParam Integer userId) {
-        // 调用 UserMapper 中的查询方法
+    public Result getBindings(@RequestParam Integer userId) {
         List<UserBindDto> bindings = userMapper.findBindingsByFollowerId(userId);
-        return ResponseEntity.ok(bindings);
-    }
-
-    // 用户绑定
-    @PostMapping("/bind")
-    @Transactional
-    public ResponseEntity<?> bindUser(@RequestParam UserBindDto bindDto) {
-        int uid1 = bindDto.getFollowerId();
-        int uid2 = bindDto.getElderId();
-
-        if (userMapper.countBinding(uid1, uid2) > 0) {
-            return ResponseEntity.badRequest().body("已经绑定过了，无需重复绑定");
-        }
-
-        userMapper.insertBinding(uid1, uid2, bindDto.getRemark());
-        userMapper.insertBinding(uid2, uid1, bindDto.getRemark());
-        return ResponseEntity.ok("绑定成功");
-    }
-
-    // 用户解绑
-    @PostMapping("/unbind")
-    @Transactional
-    public ResponseEntity<?> unbindUser(@RequestParam Integer followerId,
-                                        @RequestParam Integer elderId) {
-        userMapper.deleteBinding(followerId, elderId);
-        userMapper.deleteBinding(elderId, followerId);
-        return ResponseEntity.ok("已解除绑定");
+        return Result.success(bindings);
     }
 
     // 上传头像
@@ -176,14 +151,14 @@ public class AuthController {
 
     //更新用户信息
     @PostMapping("/upload/info")
-    public ResponseEntity<?> updateInfo(@RequestBody User user) {
+    public Result updateInfo(@RequestBody User user) {
         int result = userMapper.updateBaseInfo(user);
 
         if (result > 0) {
             User updatedUser = userMapper.findById(user.getId());
             updatedUser.setPassword(null);
-            return ResponseEntity.ok(updatedUser);
+            return Result.success(updatedUser);
         }
-        return ResponseEntity.status(500).body("更新用户信息失败");
+        return Result.error("更新用户信息失败");
     }
 }

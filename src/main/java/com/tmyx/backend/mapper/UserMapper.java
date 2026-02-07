@@ -73,11 +73,16 @@ public interface UserMapper {
     @Update("update user set avatar_url=#{avatarUrl} where id = #{id}")
     public int updateAvatar(@Param("id") Integer id, @Param("avatarUrl") String avatarUrl );
 
-    // 查询用户绑定关系
-    @Select("select u.id, u.username, u.avatar_url, b.remark " +
-            "from binding b " +
-            "join user u on b.elder_id = u.id " +
-            "where b.follower_id = #{followerId}")
+    // 查询用户的所有绑定
+    @Select("SELECT " +
+            "u.id AS id, " +
+            "u.username AS username, " +
+            "u.real_name AS realName, " +
+            "u.avatar_url AS avatarUrl, " +
+            "b.remark AS remark " +
+            "FROM binding b " +
+            "JOIN user u ON b.elder_id = u.id " + // 这里假设是查我绑定的老人
+            "WHERE b.follower_id = #{followerId}")
     public List<UserBindDto> findBindingsByFollowerId(@Param("followerId") int followerId);
 
     // 添加用户绑定关系

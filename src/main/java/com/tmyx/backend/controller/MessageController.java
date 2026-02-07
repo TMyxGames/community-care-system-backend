@@ -6,9 +6,11 @@ import com.tmyx.backend.mapper.MessageMapper;
 import com.tmyx.backend.service.MessageService;
 import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/message")
@@ -19,32 +21,39 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    // 获取系统消息列表（0：系统消息）
-//    @GetMapping("/all/{type}")
-//    public Result getMsgList(@PathVariable Integer type, @RequestAttribute Integer userId) {
-//        List<Message> messages = messageService.getMsgByType(type, userId);
-//        return Result.success(messages);
-//    }
-
-    // 获取当前用户的绑定请求列表（1：绑定请求）
-    @GetMapping("/all/1")
-    public List<Message> getBindMsgList() {
-        return messageMapper.findAllBindMsg();
+    // 根据会话获取消息列表
+    @GetMapping("/list/{sessionId}")
+    public Result getMessagesBySession(@PathVariable Integer sessionId, @RequestAttribute Integer userId) {
+        List<?> list = messageService.getMessagesBySession(sessionId, userId);
+        return Result.success(list);
     }
-
-    // 获取安全提醒列表（2：安全提醒）
-    @GetMapping("/all/2")
-    public List<Message> getSafeMsgList() {
-        return messageMapper.findAllSafeMsg();
-    }
-
 
     // 发送绑定请求
-    @PostMapping("/send/bind")
+    @PostMapping("/bind/send")
     public Result sendBindRequest(@RequestParam Integer userId, @RequestParam Integer toId) {
         messageService.sendBindingRequest(userId, toId);
         return Result.success();
     }
 
+    // 处理绑定请求
+    @PutMapping("/bind/handle")
+    public Result handleBind(@RequestBody Map<String, Object> body, @RequestAttribute Integer userId) {
+        Integer messageId = (Integer) body.get("messageId");
+        Integer status = (Integer) body.get("status");
+        messageService.handleBindRequest(messageId, status, userId);
+        return Result.success();
+    }
+
+    // 处理解绑
+    @PostMapping("/unbind")
+    public Result unbind(@RequestBody Map<String, Integer> params, @RequestAttribute Integer userId) {
+        Integer targetId = params.get("targetId");
+        if (targetId == null) {
+            return Result.error("参数错误：缺少目标用户id");
+        }
+
+        messageService.handleUnbind(userId, targetId);
+        return Result.success();
+    }
 
 }

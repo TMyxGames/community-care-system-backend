@@ -3,6 +3,7 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.entity.Address;
 import com.tmyx.backend.mapper.AddressMapper;
 import com.tmyx.backend.service.AmapService;
+import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,10 +45,10 @@ public class AddressController {
 
     // 获取地址
     @GetMapping("/get")
-    public ResponseEntity<?> getAddress(@RequestParam Integer userId) {
-        // 1. 基础校验
+    public Result getAddress(@RequestParam Integer userId) {
+        // 校验用户名
         if (userId == null) {
-            return ResponseEntity.badRequest().body("userId 不能为空");
+            return Result.error("userId不能为空");
         }
 
         try {
@@ -55,11 +56,11 @@ public class AddressController {
 
             // 2. 逻辑判断：如果没有地址，是返回 200 空列表，还是返回 404？
             // 智慧养老系统建议：即使没找到也返回 200 和空列表，方便前端直接渲染 v-for
-            return ResponseEntity.ok(list);
+            return Result.success(list);
 
         } catch (Exception e) {
             // 3. 异常处理：返回 500 错误
-            return ResponseEntity.status(500).body("服务器内部错误：" + e.getMessage());
+            return Result.error("服务器内部错误");
         }
     }
 

@@ -1,15 +1,11 @@
 package com.tmyx.backend.entity;
 
 public class UserBindDto {
-    private Integer id;
-    private Integer userId;
-    private Integer followerId;
-    private Integer elderId;
-    private String avatarUrl;
-    private String remark;
-
-    public UserBindDto() {
-    }
+    private Integer id; // 对方用户id
+    private String username; // 对方用户名
+    private String realName; // 对方真实姓名
+    private String avatarUrl; // 对方头像
+    private String remark; // 绑定关系备注
 
     public Integer getId() {
         return id;
@@ -19,25 +15,13 @@ public class UserBindDto {
         this.id = id;
     }
 
-    public Integer getUserId() { return userId;}
+    public String getUsername() { return username; }
 
-    public void setUserId(Integer userId) { this.userId = userId;}
+    public void setUsername(String username) { this.username = username; }
 
-    public Integer getFollowerId() {
-        return followerId;
-    }
+    public String getRealName() { return realName; }
 
-    public void setFollowerId(Integer followerId) {
-        this.followerId = followerId;
-    }
-
-    public Integer getElderId() {
-        return elderId;
-    }
-
-    public void setElderId(Integer elderId) {
-        this.elderId = elderId;
-    }
+    public void setRealName(String realName) { this.realName = realName; }
 
     public String getAvatarUrl() { return avatarUrl; }
 
@@ -55,9 +39,8 @@ public class UserBindDto {
     public String toString() {
         return "UserBindingDto{" +
                 "id=" + id +
-                ", userId='" + userId + '\'' +
-                ", followerId='" + followerId + '\'' +
-                ", elderId='" + elderId + '\'' +
+                ", username='" + username + '\'' +
+                ", realName='" + realName + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", remark='" + remark + '\'' +
                 '}';

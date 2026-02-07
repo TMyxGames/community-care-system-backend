@@ -9,28 +9,70 @@ public class Result<T> {
     private String msg; // 返回信息
     private T data; // 返回数据
 
-    // 带数据的成功方法
+    // 默认成功
     public static <T> Result<T> success(T data) {
+        return build(200, "操作成功", data);
+    }
+
+    // 默认失败
+    public static <T> Result<T> error(String msg) {
+        return build(500, msg, null);
+    }
+
+    // 自定义状态码
+    public static <T> Result<T> build(Integer code, String msg, T data) {
         Result<T> result = new Result<>();
-        result.setCode(200);
-        result.setMsg("操作成功");
+        result.setCode(code);
+        result.setMsg(msg);
         result.setData(data);
         return result;
     }
 
-    // 不带数据的成功方法
+    // 不带数据的成功
     public static <T> Result<T> success() {
-        Result<T> result = new Result<>();
-        result.setCode(200);
-        result.setMsg("操作成功");
-        return result;
+        return build(200, "操作成功", null);
     }
 
-    // 带数据的错误方法
-    public static <T> Result<T> error(String msg) {
-        Result<T> result = new Result<>();
-        result.setCode(500);
-        result.setMsg(msg);
-        return result;
+    // 401, 403...
+    public static <T> Result<T> error(Integer code, String msg) {
+        return build(code, msg, null);
     }
+
+
+
+    // getter, setter
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "code=" + code +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
+    }
+
+
 }

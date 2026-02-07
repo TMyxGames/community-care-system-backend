@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tmyx.backend.mapper.MessageMapper">
+
+    <resultMap id="MessageDetailMap" type="com.tmyx.backend.entity.Message">
+        <id property="id" column="id"/>
+        <result property="fromId" column="from_id"/>
+        <result property="toId" column="to_id"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="sendTime" column="send_time"/>
+        <result property="fromSessionId" column="from_session_id"/>
+        <result property="toSessionId" column="to_session_id"/>
+
+        <association property="otherUser" javaType="com.tmyx.backend.entity.User">
+            <id property="id" column="u_id"/>
+            <result property="username" column="u_username"/>
+            <result property="realName" column="u_realname"/>
+            <result property="avatarUrl" column="u_avatar"/>
+        </association>
+    </resultMap>
+
+    <select id="findBySessionId" resultMap="MessageDetailMap">
+        SELECT
+            m.*,
+            u.id as u_id,
+            u.username as u_username,
+            u.real_name as u_realname,
+            u.avatar_url as u_avatar
+        FROM message m
+                 LEFT JOIN user u ON (
+            IF(m.from_id = #{currentUserId}, m.to_id = u.id, m.from_id = u.id)
+            )
+        WHERE m.from_session_id = #{sessionId} or m.to_session_id = #{sessionId}
+        ORDER BY m.send_time DESC
+    </select>
+
+
+    <update id="updateStatus">
+        UPDATE message
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -15,6 +15,15 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry  registry) {
         registry.addInterceptor(loginCheckInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/login", "/auth/register");
+                .excludePathPatterns(
+                        "/auth/login",          // 登录
+                        "/auth/register",       // 注册
+                        "/auth/sendCaptcha",    // 发送验证码
+                        "/carousel/**",        // 获取轮播图
+                        "/carousel/all",
+                        "/service/**",         // 获取服务数据
+                        "/service/all",
+                        "/user/**"            // 获取用户头像
+                );
     }
 }

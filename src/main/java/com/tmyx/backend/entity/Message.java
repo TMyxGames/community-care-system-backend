@@ -6,17 +6,17 @@ import java.util.Date;
 
 public class Message {
     private Integer id;
+    private Integer fromSessionId;
+    private Integer toSessionId;
     private Integer fromId;
     private Integer toId;
-    private Integer type; // 0: 系统消息 1: 用户绑定请求
+    private String content;
+    private Integer type; // 0: 系统通知 1: 绑定请求 2: 安全提醒 3: 用户私信
     private Integer status; // 0: 未处理 1: 已同意 2: 已拒绝 该字段仅在用户绑定请求中使用
-    private String contentUrl; // 该字段仅在系统消息中使用
     private Date sendTime;
 
     @TableField(exist = false)
-    private User fromUser;
-    @TableField(exist = false)
-    private User toUser;
+    private User otherUser;
 
     public Integer getId() {
         return id;
@@ -25,6 +25,14 @@ public class Message {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public Integer getFromSessionId() { return fromSessionId; }
+
+    public void setFromSessionId(Integer fromSessionId) { this.fromSessionId = fromSessionId; }
+
+    public Integer getToSessionId() { return toSessionId; }
+
+    public void setToSessionId(Integer toSessionId) { this.toSessionId = toSessionId; }
 
     public Integer getFromId() {
         return fromId;
@@ -42,13 +50,13 @@ public class Message {
         this.toId = toId;
     }
 
-    public Integer getType() {
-        return type;
-    }
+    public String getContent() { return content; }
 
-    public void setType(Integer type) {
-        this.type = type;
-    }
+    public void setContent(String content) { this.content = content; }
+
+    public Integer getType() { return type; }
+
+    public void setType(Integer type) { this.type = type; }
 
     public Integer getStatus() {
         return status;
@@ -56,14 +64,6 @@ public class Message {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public String getContentUrl() {
-        return contentUrl;
-    }
-
-    public void setContentUrl(String contentUrl) {
-        this.contentUrl = contentUrl;
     }
 
     public Date getSendTime() {
@@ -74,31 +74,25 @@ public class Message {
         this.sendTime = sendTime;
     }
 
-    public User getFromUser() {
-        return fromUser;
+    public User getOtherUser() {
+        return otherUser;
     }
 
-    public void setFromUser(User fromUser) {
-        this.fromUser = fromUser;
-    }
-
-    public User getToUser() {
-        return toUser;
-    }
-
-    public void setToUser(User toUser) {
-        this.toUser = toUser;
+    public void setOtherUser(User otherUser) {
+        this.otherUser = otherUser;
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "id=" + id +
+                ", fromSessionId=" + fromSessionId +
+                ", toSessionId=" + toSessionId +
                 ", fromId=" + fromId +
                 ", toId=" + toId +
+                ", content='" + content + '\'' +
                 ", type=" + type +
                 ", status=" + status +
-                ", contentUrl='" + contentUrl + '\'' +
                 ", sendTime=" + sendTime +
                 '}';
     }

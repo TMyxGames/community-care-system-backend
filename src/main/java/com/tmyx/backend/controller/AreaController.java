@@ -4,6 +4,7 @@ import com.tmyx.backend.entity.SafeArea;
 import com.tmyx.backend.entity.ServiceArea;
 import com.tmyx.backend.mapper.SafeAreaMapper;
 import com.tmyx.backend.mapper.ServiceAreaMapper;
+import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,10 @@ public class AreaController {
 
     // 获取所有服务区域
     @GetMapping("/service/all")
-    public List<ServiceArea> getAllServiceArea() {
-        return serviceAreaMapper.findAll();
+    public Result getAllServiceArea() {
+
+        List<ServiceArea> areas = serviceAreaMapper.findAll();
+        return Result.success(areas);
     }
 
     // 添加服务区域
@@ -51,8 +54,9 @@ public class AreaController {
 
     // 获取所有安全区域
     @GetMapping("/safe/all")
-    public List<SafeArea> getAllSafeArea() {
-        return safeAreaMapper.findAll();
+    public Result getAllSafeArea() {
+        List<SafeArea> areas = safeAreaMapper.findAll();
+        return Result.success(areas);
     }
 
     // 添加服务区域

@@ -4,13 +4,13 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.entity.Carousel;
 import com.tmyx.backend.mapper.CarouselMapper;
 import com.tmyx.backend.util.FileUtil;
+import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.transform.Result;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -31,8 +31,9 @@ public class CarouselController {
 
     // 获取轮播数据
     @GetMapping("/all")
-    public List<Carousel> getAllCarousels() {
-        return carouselMapper.findAll();
+    public Result getAllCarousels() {
+        List<Carousel> carousels = carouselMapper.findAll();
+        return Result.success(carousels);
     }
 
     // 上传图片文件

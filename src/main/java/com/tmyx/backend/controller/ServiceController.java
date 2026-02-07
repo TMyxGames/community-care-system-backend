@@ -5,6 +5,7 @@ import com.tmyx.backend.entity.Carousel;
 import com.tmyx.backend.entity.Service;
 import com.tmyx.backend.mapper.ServiceMapper;
 import com.tmyx.backend.util.FileUtil;
+import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +32,17 @@ public class ServiceController {
 
     // 获取全部服务数据
     @GetMapping("/all")
-    public List<Service> getAllService() { return serviceMapper.findAll(); }
+    public Result getAllService() {
+        List<Service> services = serviceMapper.findAll();
+        return Result.success(services);
+    }
 
     // 获取当前的服务数据
     @GetMapping("/{id}")
-    public Service getServiceById(@PathVariable int id) { return serviceMapper.findById(id); }
+    public Result getServiceById(@PathVariable int id) {
+        Service service = serviceMapper.findById(id);
+        return Result.success(service);
+    }
 
     // 上传Markdown文件
     @PostMapping("/upload/markdown")
