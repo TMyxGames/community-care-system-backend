@@ -1,7 +1,7 @@
 package com.tmyx.backend.mapper;
 
 import com.tmyx.backend.entity.User;
-import com.tmyx.backend.entity.UserBindDto;
+import com.tmyx.backend.dto.UserBindDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -79,6 +79,7 @@ public interface UserMapper {
             "u.username AS username, " +
             "u.real_name AS realName, " +
             "u.avatar_url AS avatarUrl, " +
+            "b.relation AS relation, " +
             "b.remark AS remark " +
             "FROM binding b " +
             "JOIN user u ON b.elder_id = u.id " + // 这里假设是查我绑定的老人
@@ -86,10 +87,11 @@ public interface UserMapper {
     public List<UserBindDto> findBindingsByFollowerId(@Param("followerId") int followerId);
 
     // 添加用户绑定关系
-    @Insert("insert into binding(follower_id, elder_id, remark) " +
-            "values(#{followerId}, #{elderId}, #{remark})")
+    @Insert("insert into binding(follower_id, elder_id, relation, remark) " +
+            "values(#{followerId}, #{elderId}, #{relation}, #{remark})")
     int insertBinding(@Param("followerId") int followerId,
                       @Param("elderId") int elderId,
+                      @Param("relation") int relation,
                       @Param("remark") String remark);
 
     // 删除用户绑定关系

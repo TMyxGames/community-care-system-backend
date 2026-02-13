@@ -7,6 +7,7 @@ public class Order {
     private Integer id;
     private String orderSn;
     private Integer userId;
+    private Integer staffId;
     private Integer serviceId;
     private String serviceTitle;
     private String serviceImg;
@@ -17,8 +18,6 @@ public class Order {
     private LocalDateTime scheduledTime;
     private LocalDateTime completeTime;
     private Integer state;
-    private Integer rate;
-    private String comment;
 
     public Integer getId() { return id; }
 
@@ -31,6 +30,10 @@ public class Order {
     public Integer getUserId() { return userId; }
 
     public void setUserId(Integer userId) { this.userId = userId; }
+
+    public Integer getStaffId() { return staffId; }
+
+    public void setStaffId(Integer staffId) { this.staffId = staffId; }
 
     public Integer getServiceId() { return serviceId; }
 
@@ -72,20 +75,13 @@ public class Order {
 
     public void setState(Integer state) { this.state = state; }
 
-    public Integer getRate() { return rate; }
-
-    public void setRate(Integer rate) { this.rate = rate; }
-
-    public String getComment() { return comment; }
-
-    public void setComment(String comment) { this.comment = comment; }
-
     @Override
     public String toString() {
         return "Order{" +
                 "id=" + id +
                 ", orderSn='" + orderSn + '\'' +
                 ", userId=" + userId +
+                ", staffId=" + staffId +
                 ", serviceId=" + serviceId +
                 ", serviceTitle='" + serviceTitle + '\'' +
                 ", serviceImg='" + serviceImg + '\'' +
@@ -96,8 +92,6 @@ public class Order {
                 ", scheduledTime=" + scheduledTime +
                 ", completeTime=" + completeTime +
                 ", state=" + state +
-                ", rate=" + rate +
-                ", comment='" + comment + '\'' +
                 '}';
     }
 

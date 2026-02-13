@@ -45,7 +45,7 @@ public class AddressController {
 
     // 获取地址
     @GetMapping("/get")
-    public Result getAddress(@RequestParam Integer userId) {
+    public Result getAddress(@RequestAttribute Integer userId) {
         // 校验用户名
         if (userId == null) {
             return Result.error("userId不能为空");

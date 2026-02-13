@@ -2,7 +2,6 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.tmyx.backend.mapper.MessageMapper">
 
     <resultMap id="MessageDetailMap" type="com.tmyx.backend.entity.Message">
@@ -16,7 +15,7 @@
         <result property="fromSessionId" column="from_session_id"/>
         <result property="toSessionId" column="to_session_id"/>
 
-        <association property="otherUser" javaType="com.tmyx.backend.entity.User">
+        <association property="otherUser" javaType="com.tmyx.backend.dto.UserBindDto">
             <id property="id" column="u_id"/>
             <result property="username" column="u_username"/>
             <result property="realName" column="u_realname"/>

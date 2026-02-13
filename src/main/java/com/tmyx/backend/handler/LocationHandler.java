@@ -15,7 +15,7 @@ public class LocationHandler extends TextWebSocketHandler {
 
     // 建立连接时触发
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
         sessions.add(session);
         System.out.println("连接成功，当前连接数：" + sessions.size());
     }

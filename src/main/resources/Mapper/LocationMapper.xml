@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tmyx.backend.mapper.LocationMapper">
+
+    <select id="findLocationsByUserIds" resultType="com.tmyx.backend.entity.Location">
+        SELECT user_id, lng, lat, update_time
+        FROM location
+        WHERE user_id IN
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findAllUserLocations" resultType="com.tmyx.backend.dto.LocationDto">
+        SELECT
+            l.user_id as userId,
+            l.lng,
+            l.lat,
+            u.avatar_url as avatarUrl FROM location l
+            LEFT JOIN user u ON l.user_id = u.id
+        WHERE u.role = 0
+    </select>
+
+    <select id="findAllStaffLocations" resultType="com.tmyx.backend.dto.LocationDto">
+        SELECT
+            l.user_id as userId,
+            l.lng,
+            l.lat,
+            u.avatar_url as avatarUrl FROM location l
+        LEFT JOIN user u ON l.user_id = u.id
+        WHERE u.role = 2
+    </select>
+
+    <update id="updateLocation">
+        UPDATE location
+        SET lng = #{lng},
+            lat = #{lat},
+            update_time = #{updateTime}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

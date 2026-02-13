@@ -1,10 +1,12 @@
-package com.tmyx.backend.entity;
+package com.tmyx.backend.dto;
 
 public class UserBindDto {
     private Integer id; // 对方用户id
     private String username; // 对方用户名
     private String realName; // 对方真实姓名
+    private String sex; // 对方性别
     private String avatarUrl; // 对方头像
+    private Integer relation; // 关系（0: 关注者 1: 被关注者）
     private String remark; // 绑定关系备注
 
     public Integer getId() {
@@ -23,9 +25,21 @@ public class UserBindDto {
 
     public void setRealName(String realName) { this.realName = realName; }
 
+    public String getSex() { return sex; }
+
+    public void setSex(String sex) { this.sex = sex; }
+
     public String getAvatarUrl() { return avatarUrl; }
 
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public Integer getRelation() {
+        return relation;
+    }
+
+    public void setRelation(Integer relation) {
+        this.relation = relation;
+    }
 
     public String getRemark() {
         return remark;
@@ -41,7 +55,9 @@ public class UserBindDto {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", realName='" + realName + '\'' +
+                ", sex='" + sex + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
+                ", relation=" + relation +
                 ", remark='" + remark + '\'' +
                 '}';
     }

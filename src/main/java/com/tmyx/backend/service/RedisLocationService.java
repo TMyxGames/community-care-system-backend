@@ -1,6 +1,9 @@
 package com.tmyx.backend.service;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.tmyx.backend.dto.LocationDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -17,10 +20,17 @@ public class RedisLocationService {
     private static final String BASE_KEY = "location:cache:";
 
     // 动态传入类型
-    public void updateLocation(String type, Integer id, Double lng, Double lat) {
+    public void updateLocation(String type, Integer userId, LocationDto dto) {
         String key = BASE_KEY + type;
-        String value = lng + "," + lat;
-        redisTemplate.opsForHash().put(key, id.toString(), value);
+        String jsonValue = JSON.toJSONString(dto, SerializerFeature.WriteNonStringKeyAsString);
+        redisTemplate.opsForHash().put(key, userId.toString(), jsonValue);
+    }
+
+    public LocationDto getLocationDto (String type, Integer userId) {
+        String key = BASE_KEY + type;
+        Object json = redisTemplate.opsForHash().get(key, userId.toString());
+        if (json == null) return null;
+        return JSON.parseObject(json.toString(), LocationDto.class);
     }
 
     // 获取指定类型的所有位置信息

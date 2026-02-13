@@ -1,17 +1,15 @@
 package com.tmyx.backend.controller;
 
 
-import com.tmyx.backend.entity.StaffConfigDto;
+import com.tmyx.backend.dto.StaffConfigDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.tmyx.backend.util.Result;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -38,8 +36,9 @@ public class UserController {
 
     // 获取所有服务人员
     @GetMapping("/staff/all")
-    public List<User> getAllStaff() {
-        return userService.getStaffList();
+    public Result getAllStaff() {
+        List<User> staffs = userService.getStaffList();
+        return Result.success(staffs);
     }
 
     // 更新服务人员配置（服务区域、服务项目）

@@ -30,8 +30,8 @@ public class MessageController {
 
     // 发送绑定请求
     @PostMapping("/bind/send")
-    public Result sendBindRequest(@RequestParam Integer userId, @RequestParam Integer toId) {
-        messageService.sendBindingRequest(userId, toId);
+    public Result sendBindRequest(@RequestAttribute Integer userId, @RequestParam Integer toId, @RequestParam Integer relation) {
+        messageService.sendBindingRequest(userId, toId, relation);
         return Result.success();
     }
 

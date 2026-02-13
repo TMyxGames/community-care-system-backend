@@ -47,7 +47,7 @@ public class OrderController {
 
     // 获取用户订单列表
     @GetMapping("/get")
-    public Result getOrderList(@RequestParam Integer userId) {
+    public Result getOrderList(@RequestAttribute Integer userId) {
         List<Order> list = orderMapper.findByUserId(userId);
         return Result.success(list);
     }

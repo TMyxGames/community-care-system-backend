@@ -1,6 +1,7 @@
 package com.tmyx.backend.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.tmyx.backend.dto.UserBindDto;
 
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class Message {
     private Date sendTime;
 
     @TableField(exist = false)
-    private User otherUser;
+    private UserBindDto otherUser;
 
     public Integer getId() {
         return id;
@@ -74,13 +75,11 @@ public class Message {
         this.sendTime = sendTime;
     }
 
-    public User getOtherUser() {
+    public UserBindDto getOtherUser() {
         return otherUser;
     }
 
-    public void setOtherUser(User otherUser) {
-        this.otherUser = otherUser;
-    }
+    public void setOtherUser(UserBindDto otherUser) { this.otherUser = otherUser; }
 
     @Override
     public String toString() {

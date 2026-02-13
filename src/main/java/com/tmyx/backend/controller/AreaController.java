@@ -23,7 +23,6 @@ public class AreaController {
     // 获取所有服务区域
     @GetMapping("/service/all")
     public Result getAllServiceArea() {
-
         List<ServiceArea> areas = serviceAreaMapper.findAll();
         return Result.success(areas);
     }
@@ -50,12 +49,10 @@ public class AreaController {
         }
     }
 
-
-
     // 获取所有安全区域
     @GetMapping("/safe/all")
-    public Result getAllSafeArea() {
-        List<SafeArea> areas = safeAreaMapper.findAll();
+    public Result getAllSafeArea(@RequestAttribute Integer userId) {
+        List<SafeArea> areas = safeAreaMapper.findByUserId(userId);
         return Result.success(areas);
     }
 

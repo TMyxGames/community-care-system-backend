@@ -1,9 +1,9 @@
 package com.tmyx.backend.controller;
 
 import com.tmyx.backend.entity.User;
-import com.tmyx.backend.entity.UserBindDto;
-import com.tmyx.backend.entity.UserLoginDto;
-import com.tmyx.backend.entity.UserRegiDto;
+import com.tmyx.backend.dto.UserBindDto;
+import com.tmyx.backend.dto.UserLoginDto;
+import com.tmyx.backend.dto.UserRegiDto;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
 import com.tmyx.backend.util.FileUtil;
@@ -12,8 +12,6 @@ import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -119,7 +117,7 @@ public class AuthController {
 
     // 获取绑定数据
     @GetMapping("/bindings")
-    public Result getBindings(@RequestParam Integer userId) {
+    public Result getBindings(@RequestAttribute Integer userId) {
         List<UserBindDto> bindings = userMapper.findBindingsByFollowerId(userId);
         return Result.success(bindings);
     }

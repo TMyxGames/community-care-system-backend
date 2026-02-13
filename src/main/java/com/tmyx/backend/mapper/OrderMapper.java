@@ -10,12 +10,12 @@ import java.util.List;
 public interface OrderMapper {
 
     // 创建订单
-    @Insert("insert into `order`(order_sn, user_id, " +
+    @Insert("insert into `order`(order_sn, user_id, staff_id" +
             "service_id, service_title, service_img, service_price, " +
-            "address_id, address_shot, create_time, scheduled_time, complete_time, state, rate, comment) " +
-            "values (#{orderSn}, #{userId}, #{serviceId}, #{serviceTitle}, " +
+            "address_id, address_shot, create_time, scheduled_time, complete_time, state) " +
+            "values (#{orderSn}, #{userId}, #{staffId}, #{serviceId}, #{serviceTitle}, " +
             "#{serviceImg}, #{servicePrice}, #{addressId}, #{addressShot}, " +
-            "#{createTime}, #{scheduledTime}, #{completeTime}, #{state}, #{rate}, #{comment} )")
+            "#{createTime}, #{scheduledTime}, #{completeTime}, #{state})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insertOrder(Order order);
 
@@ -27,7 +27,5 @@ public interface OrderMapper {
     @Update("update `order` set state=#{state} where id=#{id}")
     public int updateState(Integer id, Integer state);
 
-    // 提交评价
-    @Update("update `order` set rate=#{rate}, comment=#{comment}, state=2 where id=#{id}")
-    public int updateComment(Integer id, Integer rate, String comment);
+
 }

@@ -15,8 +15,6 @@ public class User {
     private Integer role; // 0: 用户, 1: 管理员, 2: 服务人员
     private Integer serviceStatus; // 0: 离线, 1: 空闲中, 2: 活动中
     private Integer serviceAreaId;
-    private Double lng;
-    private Double lat;
 
     @TableField(exist = false)
     private String areaName;
@@ -80,14 +78,6 @@ public class User {
 
     public void setServiceIds(List<Integer> serviceIds) { this.serviceIds = serviceIds; }
 
-    public Double getLng() { return lng; }
-
-    public void setLng(Double lng) { this.lng = lng; }
-
-    public Double getLat() { return lat; }
-
-    public void setLat(Double lat) { this.lat = lat; }
-
     @Override
     public String toString() {
         return "User{" +
@@ -101,8 +91,6 @@ public class User {
                 ", role='" + role + '\'' +
                 ", serviceStatus='" + serviceStatus + '\'' +
                 ", serviceAreaId='" + serviceAreaId + '\'' +
-                ", lng=" + lng +
-                ", lat=" + lat +
                 '}';
     }
 

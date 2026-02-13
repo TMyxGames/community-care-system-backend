@@ -1,4 +1,4 @@
-package com.tmyx.backend.entity;
+package com.tmyx.backend.dto;
 
 public class UserRegiDto {
     private String username;

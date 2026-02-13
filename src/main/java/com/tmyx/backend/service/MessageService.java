@@ -2,8 +2,7 @@ package com.tmyx.backend.service;
 
 import com.tmyx.backend.entity.Message;
 import com.tmyx.backend.entity.Session;
-import com.tmyx.backend.entity.User;
-import com.tmyx.backend.entity.UserBindDto;
+import com.tmyx.backend.dto.UserBindDto;
 import com.tmyx.backend.handler.MessageHandler;
 import com.tmyx.backend.mapper.MessageMapper;
 import com.tmyx.backend.mapper.SessionMapper;
@@ -13,11 +12,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MessageService {
@@ -49,7 +48,7 @@ public class MessageService {
     }
 
     // 发送绑定请求
-    public void sendBindingRequest(Integer fromId, Integer toId) {
+    public void sendBindingRequest(Integer fromId, Integer toId, Integer relation) {
         if (fromId.equals(toId)) {
             throw new RuntimeException("不能绑定自己");
         }
@@ -65,12 +64,13 @@ public class MessageService {
         msg.setToId(toId); // 接收者id
         msg.setType(1); // 1: 绑定请求
         msg.setStatus(0); // 0: 未处理
+        msg.setContent(relation.toString()); // 关系（将数字转换为字符串)
         msg.setSendTime(new Date());
         // 插入消息到数据库
         messageMapper.insert(msg);
         System.out.println("插入后的消息ID: " + msg.getId());
         // 获取发送者的信息
-        User senderInfo = userMapper.findById(fromId);
+        UserBindDto senderInfo = userService.getUserBindDto(fromId);
         msg.setOtherUser(senderInfo);
         // 给接收者实时提醒
         messageHandler.sendMessageToUser(toId, msg);
@@ -93,29 +93,41 @@ public class MessageService {
         msg.setStatus(status);
         // 如果同意，则调用UserMapper进行绑定
         if (status == 1) {
-            if (userMapper.countBinding(msg.getFromId(), msg.getToId()) == 0) {
-                userMapper.insertBinding(msg.getFromId(), msg.getToId(), "");
-                userMapper.insertBinding(msg.getToId(), msg.getFromId(), "");
+            Integer fromId = msg.getFromId(); // 发送者id
+            Integer toId = msg.getToId(); // 接收者id
+            Integer relation = Integer.parseInt(msg.getContent()); // 关系（将字符串转换为数字)
+            // 判断是否已绑定
+            if (userMapper.countBinding(fromId, toId) == 0) {
+                // 判断发起者的身份（0: 关注者, 1: 被关注者)
+                if (relation == 0) {
+                    userMapper.insertBinding(fromId, toId, 0, "");
+                    userMapper.insertBinding(toId, fromId, 1, "");
+                } else {
+                    userMapper.insertBinding(fromId, toId, 1, "");
+                    userMapper.insertBinding(toId, fromId, 0, "");
+                }
+
             }
         }
         // 获取双方的身份信息
-        User userA = userMapper.findById(msg.getFromId()); // 发送者
-        User userB = userMapper.findById(msg.getToId()); // 接收者
-        // 实时推送消息给发送者
+        UserBindDto userA = userService.getUserBindDto(msg.getFromId()); // 发送者
+        UserBindDto userB = userService.getUserBindDto(msg.getToId()); // 接收者
+        // 构造双方的推送消息
         Message toA = cloneMessage(msg);
         toA.setOtherUser(userB);
-        messageHandler.sendMessageToUser(msg.getFromId(), toA);
-        // 实时推送消息给接受者
         Message toB = cloneMessage(msg);
         toB.setOtherUser(userA);
-        messageHandler.sendMessageToUser(msg.getToId(), toB);
-    }
+        // 在数据库写入成功后给发送者和接收者推送消息
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    messageHandler.sendMessageToUser(msg.getFromId(), toA);
+                    messageHandler.sendMessageToUser(msg.getToId(), toB);
+                }
+            });
+        }
 
-    // 拷贝消息（给处理绑定请求方法使用）
-    private Message cloneMessage(Message origin) {
-        Message copy = new Message();
-        BeanUtils.copyProperties(origin, copy);
-        return copy;
     }
 
     // 处理解绑
@@ -143,16 +155,30 @@ public class MessageService {
 
         messageMapper.insert(unbindMsg);
         // 获取双方的身份信息
-        User userA = userMapper.findById(unbindMsg.getFromId()); // 发送者
-        User userB = userMapper.findById(unbindMsg.getToId()); // 接收者
-        // 实时推送消息给发送者
+        UserBindDto userA = userService.getUserBindDto(unbindMsg.getFromId()); // 发送者
+        UserBindDto userB = userService.getUserBindDto(unbindMsg.getToId()); // 接收者
+        // 构造双方的推送消息
         Message toA = cloneMessage(unbindMsg);
         toA.setOtherUser(userB);
-        messageHandler.sendMessageToUser(unbindMsg.getFromId(), toA);
-        // 实时推送消息给接受者
         Message toB = cloneMessage(unbindMsg);
         toB.setOtherUser(userA);
-        messageHandler.sendMessageToUser(unbindMsg.getToId(), toB);
+        // 在数据库写入成功后给发送者和接收者推送消息
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    messageHandler.sendMessageToUser(unbindMsg.getFromId(), toA);
+                    messageHandler.sendMessageToUser(unbindMsg.getToId(), toB);
+                }
+            });
+        }
+    }
+
+    // 拷贝消息（给处理绑定请求方法使用）
+    private Message cloneMessage(Message origin) {
+        Message copy = new Message();
+        BeanUtils.copyProperties(origin, copy);
+        return copy;
     }
 
 
