@@ -18,9 +18,23 @@
             l.user_id as userId,
             l.lng,
             l.lat,
-            u.avatar_url as avatarUrl FROM location l
-            LEFT JOIN user u ON l.user_id = u.id
-        WHERE u.role = 0
+            u.avatar_url as avatarUrl
+        FROM location l
+        LEFT JOIN user u ON l.user_id = u.id
+        WHERE u.role = 3
+    </select>
+
+    <select id="findLocationsByFollowerId" resultType="com.tmyx.backend.dto.LocationDto">
+        SELECT
+            l.user_id as userId,
+            l.lng,
+            l.lat,
+            u.avatar_url as avatarUrl,
+            u.username as username
+        FROM binding b
+        JOIN location l ON b.elder_id = l.user_id
+        JOIN user u ON l.user_id = u.id
+        WHERE b.follower_id = #{followerId}
     </select>
 
     <select id="findAllStaffLocations" resultType="com.tmyx.backend.dto.LocationDto">

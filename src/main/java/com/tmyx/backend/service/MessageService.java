@@ -98,15 +98,7 @@ public class MessageService {
             Integer relation = Integer.parseInt(msg.getContent()); // 关系（将字符串转换为数字)
             // 判断是否已绑定
             if (userMapper.countBinding(fromId, toId) == 0) {
-                // 判断发起者的身份（0: 关注者, 1: 被关注者)
-                if (relation == 0) {
-                    userMapper.insertBinding(fromId, toId, 0, "");
-                    userMapper.insertBinding(toId, fromId, 1, "");
-                } else {
-                    userMapper.insertBinding(fromId, toId, 1, "");
-                    userMapper.insertBinding(toId, fromId, 0, "");
-                }
-
+                userMapper.insertBinding(fromId, toId, 0, "");
             }
         }
         // 获取双方的身份信息
@@ -140,9 +132,8 @@ public class MessageService {
         if (fromSession == null || toSession == null) {
             throw new RuntimeException("会话异常");
         }
-        // 删除binding表中的双向记录
+        // 删除binding表中的记录
         userMapper.deleteBinding(currentUserId, targetId);
-        userMapper.deleteBinding(targetId, currentUserId);
         // 插入一条解绑消息（status=3 解绑）
         Message unbindMsg = new Message();
         unbindMsg.setFromSessionId(fromSession.getId()); // 发送者会话id

@@ -99,10 +99,25 @@ public class AuthController {
         }
         // 校验用户身份
         if (loginDto.getRole() != null) {
-            int role = loginDto.getRole();
-            if (role != 0 && !user.getRole().equals(role)) {
-                String roleName = role == 1 ? "管理员" : "服务人员";
-                return Result.error(403, "权限不足：该账号不是" + roleName);
+            Integer requestedRole = loginDto.getRole();
+            Integer actualRole = user.getRole();
+            // 尝试以家属身份登录（role=0）
+            if (requestedRole == 0) {
+                // 只有老人不能以家属身份登录（role=3）
+                if (actualRole == 3) {
+                    return Result.error(403, "该账号身份为“老人”，请选择“老人”身份登录");
+                }
+            } else {
+                // 必须与数据库身份完全一致
+                if (!actualRole.equals(requestedRole)) {
+                    String roleName = "";
+                    switch (requestedRole) {
+                        case 1: roleName = "管理员"; break;
+                        case 2: roleName = "服务人员"; break;
+                        case 3: roleName = "老人"; break;
+                    }
+                    return Result.error(403, "权限不足：该账号不是" + roleName);
+                }
             }
         }
         // 登录成功，生成JWT Token
@@ -118,7 +133,17 @@ public class AuthController {
     // 获取绑定数据
     @GetMapping("/bindings")
     public Result getBindings(@RequestAttribute Integer userId) {
-        List<UserBindDto> bindings = userMapper.findBindingsByFollowerId(userId);
+        // 获取当前用户信息
+        User currentUser = userMapper.findById(userId);
+        List<UserBindDto> bindings;
+        // 根据用户身份获取数据
+        if (currentUser.getRole() == 3) {
+            // 如果当前用户是老人，则获取老人绑定的家属列表
+            bindings = userMapper.findFollowersByElderId(userId);
+        } else {
+            // 如果当前用户是家属，则获取家属绑定的老人列表
+            bindings = userMapper.findEldersByFollowerId(userId);
+        }
         return Result.success(bindings);
     }
 

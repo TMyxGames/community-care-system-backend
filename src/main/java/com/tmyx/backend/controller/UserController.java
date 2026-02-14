@@ -5,6 +5,7 @@ import com.tmyx.backend.dto.StaffConfigDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class UserController {
 
     // 根据关键词搜索用户（id、用户名、真实姓名)
     @GetMapping("/search")
-    public Result search(@RequestParam String keyword, @RequestParam Integer userId) {
+    public Result search(@RequestParam String keyword, @RequestAttribute Integer userId) {
         List<User> users = userService.searchUsers(keyword, userId);
         return Result.success(users);
     }

@@ -2,7 +2,9 @@ package com.tmyx.backend.controller;
 
 
 import com.tmyx.backend.entity.Message;
+import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.MessageMapper;
+import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MessageService;
 import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class MessageController {
     private MessageMapper messageMapper;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private UserMapper userMapper;
 
     // 根据会话获取消息列表
     @GetMapping("/list/{sessionId}")
@@ -31,7 +35,26 @@ public class MessageController {
     // 发送绑定请求
     @PostMapping("/bind/send")
     public Result sendBindRequest(@RequestAttribute Integer userId, @RequestParam Integer toId, @RequestParam Integer relation) {
+        User currentUser = userMapper.findById(userId); // 发送者
+        User targetUser = userMapper.findById(toId); // 接收者
+        // 不能绑定自己
+        if (userId.equals(toId)) {
+            return Result.error(400, "您不能与自己绑定");
+        }
+        // 如果发送者身份为老人
+        if (currentUser.getRole() == 3) {
+            return Result.error(403, "您无权发送绑定请求");
+        }
+        // 如果接收者身份不为老人
+        if (targetUser.getRole() != 3) {
+            return Result.error(400, "您只能向老人发送绑定请求");
+        }
+        // 如果用户已经绑定过了
+        if (userMapper.countBinding(userId, toId) > 0) {
+            return Result.error(400, "您已经和该用户绑定过了");
+        }
         messageService.sendBindingRequest(userId, toId, relation);
+
         return Result.success();
     }
 

@@ -12,8 +12,8 @@ public class User {
     private String password;
     private String email;
     private String avatarUrl;
-    private Integer role; // 0: 用户, 1: 管理员, 2: 服务人员
-    private Integer serviceStatus; // 0: 离线, 1: 空闲中, 2: 活动中
+    private Integer role; // 0: 家属（用户）, 1: 管理员, 2: 服务人员, 3: 老人（用户）
+    private Integer serviceStatus; // 0: 离线, 1: 空闲中, 2: 已接单, 3: 活动中
     private Integer serviceAreaId;
 
     @TableField(exist = false)

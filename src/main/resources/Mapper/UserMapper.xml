@@ -12,6 +12,7 @@
             OR real_name LIKE CONCAT('%', #{keyword}, '%')
             OR CAST(id AS CHAR) = #{keyword})
           AND id != #{currentUserId}
+          AND role = 3
     </select>
 
 </mapper>

@@ -73,18 +73,19 @@ public interface UserMapper {
     @Update("update user set avatar_url=#{avatarUrl} where id = #{id}")
     public int updateAvatar(@Param("id") Integer id, @Param("avatarUrl") String avatarUrl );
 
-    // 查询用户的所有绑定
+    // 查询用户的所有绑定（家属使用）
     @Select("SELECT " +
-            "u.id AS id, " +
-            "u.username AS username, " +
-            "u.real_name AS realName, " +
-            "u.avatar_url AS avatarUrl, " +
-            "b.relation AS relation, " +
-            "b.remark AS remark " +
-            "FROM binding b " +
-            "JOIN user u ON b.elder_id = u.id " + // 这里假设是查我绑定的老人
-            "WHERE b.follower_id = #{followerId}")
-    public List<UserBindDto> findBindingsByFollowerId(@Param("followerId") int followerId);
+            "u.id, u.username, u.real_name, u.avatar_url, b.relation, b.remark " +
+            "FROM binding b JOIN user u ON b.elder_id = u.id " +
+            "WHERE b.follower_id = #{userId}")
+    public List<UserBindDto> findEldersByFollowerId(Integer userId);
+
+    // 查询用户的所有绑定（老人使用）
+    @Select("SELECT " +
+            "u.id, u.username, u.real_name, u.avatar_url, b.relation, b.remark " +
+            "FROM binding b JOIN user u ON b.follower_id = u.id " +
+            "WHERE b.elder_id = #{userId}")
+    public List<UserBindDto> findFollowersByElderId(Integer userId);
 
     // 添加用户绑定关系
     @Insert("insert into binding(follower_id, elder_id, relation, remark) " +
@@ -94,8 +95,9 @@ public interface UserMapper {
                       @Param("relation") int relation,
                       @Param("remark") String remark);
 
-    // 删除用户绑定关系
-    @Delete("delete from binding where follower_id = #{followerId} and elder_id = #{elderId}")
+    // 删除用户绑定关系（解绑）
+    @Delete("delete from binding where follower_id = #{followerId} and elder_id = #{elderId} " +
+                                "or follower_id = #{elderId} and elder_id = #{followerId}")
     int deleteBinding(@Param("followerId") int followerId, @Param("elderId") int elderId);
 
     // 检查是否已存在绑定关系

@@ -6,7 +6,7 @@ public class UserBindDto {
     private String realName; // 对方真实姓名
     private String sex; // 对方性别
     private String avatarUrl; // 对方头像
-    private Integer relation; // 关系（0: 关注者 1: 被关注者）
+    private Integer relation; // 关系（0: 家属, 1: 保姆, ...）
     private String remark; // 绑定关系备注
 
     public Integer getId() {

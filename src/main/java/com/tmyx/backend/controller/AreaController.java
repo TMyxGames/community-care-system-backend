@@ -2,8 +2,10 @@ package com.tmyx.backend.controller;
 
 import com.tmyx.backend.entity.SafeArea;
 import com.tmyx.backend.entity.ServiceArea;
+import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.SafeAreaMapper;
 import com.tmyx.backend.mapper.ServiceAreaMapper;
+import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,10 @@ import java.util.List;
 public class AreaController {
     @Autowired
     private ServiceAreaMapper serviceAreaMapper;
-
     @Autowired
     private SafeAreaMapper safeAreaMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     // 获取所有服务区域
     @GetMapping("/service/all")
@@ -52,8 +55,18 @@ public class AreaController {
     // 获取所有安全区域
     @GetMapping("/safe/all")
     public Result getAllSafeArea(@RequestAttribute Integer userId) {
-        List<SafeArea> areas = safeAreaMapper.findByUserId(userId);
-        return Result.success(areas);
+        // 获取当前用户信息
+        User currentUser = userMapper.findById(userId);
+        // 判断当前用户身份
+        if (currentUser.getRole() == 3) {
+            // 如果当前用户是老人
+            List<SafeArea> areas = safeAreaMapper.findByElderId(userId);
+            return Result.success(areas);
+        } else {
+            // 如果当前用户是家属
+            List<SafeArea> areas = safeAreaMapper.findByUserId(userId);
+            return Result.success(areas);
+        }
     }
 
     // 添加服务区域

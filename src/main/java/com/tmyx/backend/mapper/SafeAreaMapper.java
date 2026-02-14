@@ -20,9 +20,16 @@ public interface SafeAreaMapper {
     @Select("select * from safe_area")
     public List<SafeArea> findAll();
 
-    // 根据用户id查询安全区域
+    // 根据用户id查询安全区域（家属使用）
     @Select("select * from safe_area where user_id= #{userId}")
     public List<SafeArea> findByUserId(Integer userId);
+
+    // 根据用户id查询已绑定用户的安全区域（老人使用）
+    @Select("select a.* from safe_area a " +
+            "join binding b on a.user_id = b.follower_id " +
+            "where b.elder_id = #{elderId}")
+    public List<SafeArea> findByElderId(Integer elderId);
+
 
     // 删除安全区域
     @Delete("delete from safe_area where id=#{id}")
