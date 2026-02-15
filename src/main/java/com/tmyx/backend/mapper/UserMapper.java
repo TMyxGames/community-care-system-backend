@@ -1,5 +1,6 @@
 package com.tmyx.backend.mapper;
 
+import com.tmyx.backend.dto.UserInfoDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.dto.UserBindDto;
 import org.apache.ibatis.annotations.*;
@@ -73,19 +74,26 @@ public interface UserMapper {
     @Update("update user set avatar_url=#{avatarUrl} where id = #{id}")
     public int updateAvatar(@Param("id") Integer id, @Param("avatarUrl") String avatarUrl );
 
-    // 查询用户的所有绑定（家属使用）
+    // 查询用户的所有绑定列表（家属使用）
     @Select("SELECT " +
             "u.id, u.username, u.real_name, u.avatar_url, b.relation, b.remark " +
             "FROM binding b JOIN user u ON b.elder_id = u.id " +
             "WHERE b.follower_id = #{userId}")
     public List<UserBindDto> findEldersByFollowerId(Integer userId);
 
-    // 查询用户的所有绑定（老人使用）
+    // 查询用户的所有绑定列表（老人使用）
     @Select("SELECT " +
             "u.id, u.username, u.real_name, u.avatar_url, b.relation, b.remark " +
             "FROM binding b JOIN user u ON b.follower_id = u.id " +
             "WHERE b.elder_id = #{userId}")
     public List<UserBindDto> findFollowersByElderId(Integer userId);
+
+    // 根据用户id查询绑定者信息（发邮件时使用）
+    @Select("SELECT " +
+            "u.id, u.username, u.real_name, u.sex, u.email, u.avatar_url " +
+            "FROM binding b JOIN user u ON b.follower_id = u.id " +
+            "WHERE b.elder_id = #{userId}")
+    public List<UserInfoDto> findFollowersInfoByElderId(Integer userId);
 
     // 添加用户绑定关系
     @Insert("insert into binding(follower_id, elder_id, relation, remark) " +
