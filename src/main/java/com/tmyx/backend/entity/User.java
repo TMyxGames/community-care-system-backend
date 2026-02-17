@@ -19,6 +19,8 @@ public class User {
     @TableField(exist = false)
     private String areaName;
     private List<Integer> serviceIds;
+    private Double lng;
+    private Double lat;
 
     public Integer getId() { return id; }
 
@@ -77,6 +79,14 @@ public class User {
     public List<Integer> getServiceIds() { return serviceIds; }
 
     public void setServiceIds(List<Integer> serviceIds) { this.serviceIds = serviceIds; }
+
+    public Double getLng() { return lng; }
+
+    public void setLng(Double lng) { this.lng = lng; }
+
+    public Double getLat() { return lat; }
+
+    public void setLat(Double lat) { this.lat = lat; }
 
     @Override
     public String toString() {

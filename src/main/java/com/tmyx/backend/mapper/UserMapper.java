@@ -118,5 +118,13 @@ public interface UserMapper {
     @Update("update user set service_area_id= #{areaId} where id = #{userId}")
     public int updateServiceArea(@Param("userId") Integer userId, @Param("areaId") Integer areaId);
 
+    // 查询满足派单要求的服务人员
+    // 该方法来自UserMapper.xml
+    List<User> findQualifiedStaffs(@Param("areaId") Integer areaId, @Param("serviceId") Integer serviceId);
+
+    // 更新服务人员状态
+    @Update("update user set service_status= #{serviceStatus} where id = #{userId}")
+    public int updateServiceStatus(@Param("userId") Integer userId, @Param("serviceStatus") Integer serviceStatus);
+
 
 }

@@ -1,5 +1,6 @@
 package com.tmyx.backend.service;
 
+import com.tmyx.backend.dto.WebSocketResult;
 import com.tmyx.backend.entity.Message;
 import com.tmyx.backend.entity.Session;
 import com.tmyx.backend.dto.UserBindDto;
@@ -68,12 +69,13 @@ public class MessageService {
         msg.setSendTime(new Date());
         // 插入消息到数据库
         messageMapper.insert(msg);
-        System.out.println("插入后的消息ID: " + msg.getId());
         // 获取发送者的信息
         UserBindDto senderInfo = userService.getUserBindDto(fromId);
         msg.setOtherUser(senderInfo);
+
         // 给接收者实时提醒
-        messageHandler.sendMessageToUser(toId, msg);
+        WebSocketResult<Message> msgResult = WebSocketResult.build("bind_request", msg);
+        messageHandler.sendMessageToUser(toId, msgResult);
     }
 
     // 处理绑定请求
@@ -107,15 +109,17 @@ public class MessageService {
         // 构造双方的推送消息
         Message toA = cloneMessage(msg);
         toA.setOtherUser(userB);
+        WebSocketResult<Message> toAResult = WebSocketResult.build("bind_request", toA);
         Message toB = cloneMessage(msg);
         toB.setOtherUser(userA);
+        WebSocketResult<Message> toBResult = WebSocketResult.build("bind_request", toB);
         // 在数据库写入成功后给发送者和接收者推送消息
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    messageHandler.sendMessageToUser(msg.getFromId(), toA);
-                    messageHandler.sendMessageToUser(msg.getToId(), toB);
+                    messageHandler.sendMessageToUser(msg.getFromId(), toAResult);
+                    messageHandler.sendMessageToUser(msg.getToId(), toBResult);
                 }
             });
         }
@@ -151,15 +155,17 @@ public class MessageService {
         // 构造双方的推送消息
         Message toA = cloneMessage(unbindMsg);
         toA.setOtherUser(userB);
+        WebSocketResult<Message> toAResult = WebSocketResult.build("bind_request", toA);
         Message toB = cloneMessage(unbindMsg);
         toB.setOtherUser(userA);
+        WebSocketResult<Message> toBResult = WebSocketResult.build("bind_request", toB);
         // 在数据库写入成功后给发送者和接收者推送消息
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    messageHandler.sendMessageToUser(unbindMsg.getFromId(), toA);
-                    messageHandler.sendMessageToUser(unbindMsg.getToId(), toB);
+                    messageHandler.sendMessageToUser(unbindMsg.getFromId(), toAResult);
+                    messageHandler.sendMessageToUser(unbindMsg.getToId(), toBResult);
                 }
             });
         }

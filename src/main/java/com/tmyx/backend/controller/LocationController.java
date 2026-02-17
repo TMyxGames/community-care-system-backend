@@ -1,12 +1,9 @@
 package com.tmyx.backend.controller;
 
 
-import com.alibaba.fastjson.JSON;
 import com.tmyx.backend.dto.LocationDto;
-import com.tmyx.backend.dto.LocationMessage;
 import com.tmyx.backend.entity.Location;
 import com.tmyx.backend.entity.User;
-import com.tmyx.backend.handler.LocationHandler;
 import com.tmyx.backend.mapper.LocationMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.RedisLocationService;
@@ -14,8 +11,6 @@ import com.tmyx.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @RestController

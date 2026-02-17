@@ -2,7 +2,6 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.tmyx.backend.mapper.UserMapper">
 
     <select id="searchUsers" resultType="com.tmyx.backend.entity.User">
@@ -13,6 +12,23 @@
             OR CAST(id AS CHAR) = #{keyword})
           AND id != #{currentUserId}
           AND role = 3
+    </select>
+
+    <select id="findQualifiedStaffs" resultType="com.tmyx.backend.entity.User">
+        SELECT
+            u.id,
+            u.username,
+            l.lng,
+            l.lat
+        FROM user u
+        INNER JOIN location l ON u.id = l.user_id
+        INNER JOIN staff_work sw ON u.id = sw.staff_id
+        WHERE
+            u.role = 2
+        AND u.service_status = 1
+        AND u.service_area_id = #{areaId}
+        AND sw.service_id = #{serviceId}
+        GROUP BY u.id
     </select>
 
 </mapper>

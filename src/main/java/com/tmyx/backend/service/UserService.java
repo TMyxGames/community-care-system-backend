@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmyx.backend.dto.StaffConfigDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.dto.UserBindDto;
-import com.tmyx.backend.mapper.ServiceAreaMapper;
+import com.tmyx.backend.mapper.AreaMapper;
 import com.tmyx.backend.mapper.StaffWorkMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class UserService {
     @Autowired
     private StaffWorkMapper staffWorkMapper;
     @Autowired
-    private ServiceAreaMapper serviceAreaMapper;
+    private AreaMapper areaMapper;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -63,7 +63,7 @@ public class UserService {
             // 如果服务人员的服务区域id不为空
             if (staff.getServiceAreaId() != null) {
                 // 将服务区域id传给serviceAreaMapper，根据服务区域id查询服务区域信息
-                var area = serviceAreaMapper.findById(staff.getServiceAreaId());
+                var area = areaMapper.findServiceAreaById(staff.getServiceAreaId());
                 // 如果服务区域存在则获取它的名称
                 if (area != null) {
                     staff.setAreaName(area.getAreaName());

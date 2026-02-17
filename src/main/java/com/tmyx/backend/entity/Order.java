@@ -12,68 +12,133 @@ public class Order {
     private String serviceTitle;
     private String serviceImg;
     private BigDecimal servicePrice;
-    private Integer addressId;
+    private Double lng;
+    private Double lat;
     private String addressShot;
     private LocalDateTime createTime;
-    private LocalDateTime scheduledTime;
+    private LocalDateTime startTime;
     private LocalDateTime completeTime;
-    private Integer state;
+    private Integer state; // 0: 待接单 1: 待服务 2: 进行中 3: 已完成 4: 已评价 5: 已取消
 
-    public Integer getId() { return id; }
+    public Integer getId() {
+        return id;
+    }
 
-    public void setId(Integer id) { this.id = id; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public String getOrderSn() { return orderSn; }
+    public String getOrderSn() {
+        return orderSn;
+    }
 
-    public void setOrderSn(String orderSn) { this.orderSn = orderSn; }
+    public void setOrderSn(String orderSn) {
+        this.orderSn = orderSn;
+    }
 
-    public Integer getUserId() { return userId; }
+    public Integer getUserId() {
+        return userId;
+    }
 
-    public void setUserId(Integer userId) { this.userId = userId; }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
-    public Integer getStaffId() { return staffId; }
+    public Integer getStaffId() {
+        return staffId;
+    }
 
-    public void setStaffId(Integer staffId) { this.staffId = staffId; }
+    public void setStaffId(Integer staffId) {
+        this.staffId = staffId;
+    }
 
-    public Integer getServiceId() { return serviceId; }
+    public Integer getServiceId() {
+        return serviceId;
+    }
 
-    public void setServiceId(Integer serviceId) { this.serviceId = serviceId; }
+    public void setServiceId(Integer serviceId) {
+        this.serviceId = serviceId;
+    }
 
-    public String getServiceTitle() { return serviceTitle; }
+    public String getServiceTitle() {
+        return serviceTitle;
+    }
 
-    public void setServiceTitle(String serviceTitle) { this.serviceTitle = serviceTitle; }
+    public void setServiceTitle(String serviceTitle) {
+        this.serviceTitle = serviceTitle;
+    }
 
-    public String getServiceImg() { return serviceImg; }
+    public String getServiceImg() {
+        return serviceImg;
+    }
 
-    public void setServiceImg(String serviceImg) { this.serviceImg = serviceImg; }
+    public void setServiceImg(String serviceImg) {
+        this.serviceImg = serviceImg;
+    }
 
-    public BigDecimal getServicePrice() { return servicePrice; }
+    public BigDecimal getServicePrice() {
+        return servicePrice;
+    }
 
-    public void setServicePrice(BigDecimal servicePrice) { this.servicePrice = servicePrice; }
+    public void setServicePrice(BigDecimal servicePrice) {
+        this.servicePrice = servicePrice;
+    }
 
-    public Integer getAddressId() { return addressId; }
+    public Double getLng() {
+        return lng;
+    }
 
-    public void setAddressId(Integer addressId) { this.addressId = addressId; }
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
 
-    public String getAddressShot() { return addressShot; }
+    public Double getLat() {
+        return lat;
+    }
 
-    public void setAddressShot(String addressShot) { this.addressShot = addressShot; }
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
 
-    public LocalDateTime getCreateTime() { return createTime; }
+    public String getAddressShot() {
+        return addressShot;
+    }
 
-    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public void setAddressShot(String addressShot) {
+        this.addressShot = addressShot;
+    }
 
-    public LocalDateTime getScheduledTime() { return scheduledTime; }
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
 
-    public void setScheduledTime(LocalDateTime scheduledTime) { this.scheduledTime = scheduledTime; }
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
 
-    public LocalDateTime getCompleteTime() { return completeTime; }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
 
-    public void setCompleteTime(LocalDateTime completeTime) { this.completeTime = completeTime; }
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
 
-    public Integer getState() { return state; }
+    public LocalDateTime getCompleteTime() {
+        return completeTime;
+    }
 
-    public void setState(Integer state) { this.state = state; }
+    public void setCompleteTime(LocalDateTime completeTime) {
+        this.completeTime = completeTime;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
 
     @Override
     public String toString() {
@@ -86,13 +151,13 @@ public class Order {
                 ", serviceTitle='" + serviceTitle + '\'' +
                 ", serviceImg='" + serviceImg + '\'' +
                 ", servicePrice=" + servicePrice +
-                ", addressId=" + addressId +
+                ", lng=" + lng +
+                ", lat=" + lat +
                 ", addressShot='" + addressShot + '\'' +
                 ", createTime=" + createTime +
-                ", scheduledTime=" + scheduledTime +
+                ", startTime=" + startTime +
                 ", completeTime=" + completeTime +
                 ", state=" + state +
                 '}';
     }
-
 }
