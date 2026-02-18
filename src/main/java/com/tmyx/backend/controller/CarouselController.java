@@ -38,11 +38,12 @@ public class CarouselController {
 
     // 上传图片文件
     @PostMapping("/upload/img")
-    public String uploadImg(@RequestParam("file") MultipartFile file,
+    public Result uploadImg(@RequestParam("file") MultipartFile file,
                             @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
 
         // 保存新文件
-        File uploadDir = new File(baseUploadPath, "carousel/images/");
+        String subPath = "carousel/images/";
+        File uploadDir = new File(baseUploadPath, subPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -55,7 +56,7 @@ public class CarouselController {
             FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
         }
 
-        return "/carousel/images/" + fileName;
+        return Result.success("/files/" + subPath + fileName);
     }
 
     // 保存轮播数据

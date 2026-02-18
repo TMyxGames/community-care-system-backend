@@ -24,20 +24,28 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 确保你的上传路径是以 file: 开头的合法 URL
         String filePath = baseUploadPath.replace("\\", "/");
         if (!filePath.endsWith("/")) filePath += "/";
 
-        // 走马灯
-        registry.addResourceHandler("/carousel/**")
-                .addResourceLocations("file:" + filePath + "carousel/");
+//        // 走马灯
+//        registry.addResourceHandler("/carousel/**")
+//                .addResourceLocations("file:" + filePath + "carousel/");
+//
+//        // 服务
+//        registry.addResourceHandler("/service/**")
+//                .addResourceLocations("file:" + filePath + "service/");
+//
+//        // 用户头像
+//        registry.addResourceHandler("/user/**")
+//                .addResourceLocations("file:" + filePath + "user/");
+//
+//        // 文章
+//        registry.addResourceHandler("/article/**")
+//                .addResourceLocations("file:" + filePath + "article/");
 
-        // 服务
-        registry.addResourceHandler("/service/**")
-                .addResourceLocations("file:" + filePath + "service/");
-
-        // 用户头像
-        registry.addResourceHandler("/user/**")
-                .addResourceLocations("file:" + filePath + "user/");
+        // 通用映射
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:" + filePath)
+                .setCachePeriod(3600);
     }
 }

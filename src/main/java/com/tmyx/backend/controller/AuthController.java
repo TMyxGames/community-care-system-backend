@@ -154,7 +154,8 @@ public class AuthController {
                             @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
 
         // 保存新文件
-        File uploadDir = new File(baseUploadPath, "user/avatars/");
+        String subPath = "user/avatars/";
+        File uploadDir = new File(baseUploadPath, subPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -167,7 +168,7 @@ public class AuthController {
             FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
         }
 
-        String relativePath = "/user/avatars/" + fileName;
+        String relativePath = "/files/" + subPath + fileName;
         userMapper.updateAvatar(userId, relativePath);
         return relativePath;
     }

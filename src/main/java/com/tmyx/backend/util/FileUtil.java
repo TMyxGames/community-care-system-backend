@@ -1,6 +1,8 @@
 package com.tmyx.backend.util;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileUtil {
 
@@ -9,29 +11,22 @@ public class FileUtil {
         if (fileUrl == null || fileUrl.isEmpty()) return;
 
         try {
-            String basePath = baseUploadPath.replace("\\", "/");
-            if (!basePath.endsWith("/")) {
-                basePath += "/";
-            }
-
+            // 提取纯净路径（处理可能存在http前缀的情况）
             String pathOnly = fileUrl;
             if (fileUrl.startsWith("http")) {
-                // 找到第三个斜杠的位置（即端口号后的那个斜杠）
-                // 例如 http://localhost:8081/carousel/... 截取后变成 /carousel/...
-                try {
-                    java.net.URL url = new java.net.URL(fileUrl);
-                    pathOnly = url.getPath();
-                } catch (Exception e) {
-                    // 如果 URL 格式有问题，尝试手动截取
-                    int slashIndex = fileUrl.indexOf("/", fileUrl.indexOf("//") + 2);
-                    pathOnly = fileUrl.substring(slashIndex);
-                }
+                pathOnly = new java.net.URL(fileUrl).getPath();
+            }
+            // 去除映射路径的/files前缀
+            if (pathOnly.startsWith("/files/")) {
+                pathOnly = pathOnly.substring(7); // 去掉"/files/"这7个字符
+            } else if (pathOnly.startsWith("files/")) {
+                pathOnly = pathOnly.substring(6); // 如果不以斜杠开头那就去6个
             }
 
-            String relativePath = pathOnly.startsWith("/") ? pathOnly.substring(1) : fileUrl;
-            File file = new File(basePath + relativePath);
+            Path fullPath = Paths.get(baseUploadPath, pathOnly);
+            File file = fullPath.toFile();
 
-            System.out.println("尝试删除文件，绝对路径为: " + file.getAbsolutePath());
+            System.out.println("尝试删除文件，物理路径为: " + file.getAbsolutePath());
 
             if (file.exists() && file.isFile()) {
                 if (file.delete()) {
@@ -44,6 +39,23 @@ public class FileUtil {
             }
         } catch (Exception e) {
             System.err.println("文件删除异常: " + e.getMessage());
+        }
+    }
+
+    // 删除硬盘上的整个目录
+    public static void deleteDirectory(File directory) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteDirectory(file);
+                    } else {
+                        file.delete();
+                    }
+                }
+            }
+            directory.delete();
         }
     }
 }

@@ -46,10 +46,11 @@ public class ServiceController {
 
     // 上传Markdown文件
     @PostMapping("/upload/markdown")
-    public String uploadMarkdown(@RequestParam("file") MultipartFile file,
+    public Result uploadMarkdown(@RequestParam("file") MultipartFile file,
                                  @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
         // 保存新文件
-        File uploadDir = new File(baseUploadPath, "service/contents/");
+        String subPath = "service/contents/";
+        File uploadDir = new File(baseUploadPath, subPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -62,16 +63,17 @@ public class ServiceController {
             FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
         }
 
-        return "/service/contents/" + fileName;
+        return Result.success("/files/" + subPath + fileName);
     }
 
     // 上传图片文件
     @PostMapping("/upload/img")
-    public String uploadImg(@RequestParam("file") MultipartFile file,
+    public Result uploadImg(@RequestParam("file") MultipartFile file,
                             @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
 
         // 保存新文件
-        File uploadDir = new File(baseUploadPath, "service/images/");
+        String subPath = "service/images/";
+        File uploadDir = new File(baseUploadPath, subPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -84,7 +86,7 @@ public class ServiceController {
             FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
         }
 
-        return "/service/images/" + fileName;
+        return Result.success("/files/" + subPath + fileName);
     }
 
     // 保存服务数据

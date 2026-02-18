@@ -23,7 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/carousel/all",
                         "/service/**",         // 获取服务数据
                         "/service/all",
-                        "/user/avatars/**"            // 获取用户头像
+                        "/user/avatars/**",            // 获取用户头像
+                        "/files/**"             // 文件路径映射
                 );
     }
 }
