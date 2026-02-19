@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -65,18 +67,18 @@ public class ArticleController {
 
         try {
             // 确定文章的存储路径
-            String subPath = "/article/" + articleId + "/images/";
+            String subPath = "article/" + articleId + "/images/";
             File folder = new File(baseUploadPath + subPath);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            File dest = new File(folder + fileName);
+            File dest = new File(folder, fileName);
             file.transferTo(dest);
 
             // 拼接路径
-            String fileUrl = "/files" + subPath + fileName;
+            String fileUrl = "/files/" + subPath + fileName;
             return Result.success(fileUrl);
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,11 +93,13 @@ public class ArticleController {
         // article/{articleId}/index.md
         String relativeFolder = "/article/" + article.getId() + "/";
         String fileName = "index.md";
-        String relativeFilePath = relativeFolder + fileName;
         // 获取绝对路径
         File folder = new File(baseUploadPath + relativeFolder);
         if (!folder.exists()) folder.mkdirs();
-
+        // 清除无用图片
+        if (article.getContent() != null) {
+            FileUtil.cleanOrphanImages(article.getContent(), article.getId(), baseUploadPath);
+        }
         // 将前端传来的content写入markdown文件中
         if (article.getContent() != null) {
             try (FileWriter writer = new FileWriter(new File(folder, fileName))) {
@@ -111,7 +115,7 @@ public class ArticleController {
         // 组装文章信息
         article.setId(article.getId());
         article.setUpId(userId);
-        article.setContentUrl(relativeFilePath);
+        article.setContentUrl("/files" + relativeFolder + fileName);
         article.setUploadTime(LocalDateTime.now());
         // 检查文章是否存在
         Article existArticle = articleMapper.findById(article.getId());
@@ -129,16 +133,24 @@ public class ArticleController {
         Article article = articleMapper.findById(id);
         if (article == null) return Result.error("文章不存在");
 
-        // 根据contentUrl读取磁盘上的 index.md 内容
-        File mdFile = new File(baseUploadPath + article.getContentUrl());
-        if (mdFile.exists()) {
-            try {
-                String content = Files.readString(mdFile.toPath());
-                article.setContent(content); // 将读取到的文本塞回实体类，传给前端
-            } catch (IOException e) {
-                return Result.error("读取内容文件失败");
+        String contentUrl = article.getContentUrl();
+
+        if (contentUrl != null && !contentUrl.isEmpty()) {
+            String relativePath = contentUrl.replace("/files/", "");
+            Path fullPath = Paths.get(baseUploadPath, relativePath);
+            File mdFile = fullPath.toFile();
+
+            if (mdFile.exists()) {
+                try {
+                    String content = Files.readString(mdFile.toPath());
+                    article.setContent(content);
+                } catch (IOException e) {
+                    return Result.error("读取内容文件失败");
+                }
             }
+
         }
+
         return Result.success(article);
     }
 

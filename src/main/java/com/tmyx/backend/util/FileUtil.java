@@ -3,6 +3,10 @@ package com.tmyx.backend.util;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileUtil {
 
@@ -56,6 +60,41 @@ public class FileUtil {
                 }
             }
             directory.delete();
+        }
+    }
+
+    // 删除文章中未使用的图片
+    public static void cleanOrphanImages(String content, String articleId, String baseUploadPath) {
+        if (content == null || articleId == null) return;
+
+        // 1. 提取源码中所有引用的文件名
+        // 匹配格式如：/files/article/uuid/images/filename.png
+        Set<String> activeImageNames = new HashSet<>();
+        String regex = "/files/article/" + articleId + "/images/([^ )\"'\\n]+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        while (matcher.find()) {
+            activeImageNames.add(matcher.group(1)); // 提取文件名部分
+        }
+
+        // 2. 定位物理文件夹：uploads/article/uuid/images/
+        Path imagesDirPath = Paths.get(baseUploadPath, "article", articleId, "images");
+        File imagesDir = imagesDirPath.toFile();
+
+        if (imagesDir.exists() && imagesDir.isDirectory()) {
+            File[] files = imagesDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    // 3. 如果磁盘上的文件不在源码引用名单中，则删除
+                    if (!activeImageNames.contains(file.getName())) {
+                        boolean deleted = file.delete();
+                        if (deleted) {
+                            System.out.println("成功清理冗余图片: " + file.getAbsolutePath());
+                        }
+                    }
+                }
+            }
         }
     }
 }
