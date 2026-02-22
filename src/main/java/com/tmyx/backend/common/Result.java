@@ -1,4 +1,4 @@
-package com.tmyx.backend.util;
+package com.tmyx.backend.common;
 
 
 import lombok.Data;

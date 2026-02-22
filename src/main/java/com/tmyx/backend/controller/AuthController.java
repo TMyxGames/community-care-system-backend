@@ -8,7 +8,7 @@ import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
 import com.tmyx.backend.util.FileUtil;
 import com.tmyx.backend.util.JwtUtil;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;

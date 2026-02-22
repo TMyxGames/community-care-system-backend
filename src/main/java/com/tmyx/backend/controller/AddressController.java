@@ -3,9 +3,8 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.entity.Address;
 import com.tmyx.backend.mapper.AddressMapper;
 import com.tmyx.backend.service.AmapService;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

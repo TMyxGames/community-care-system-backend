@@ -1,11 +1,10 @@
 package com.tmyx.backend.controller;
 
 
-import com.tmyx.backend.entity.Carousel;
 import com.tmyx.backend.entity.Service;
 import com.tmyx.backend.mapper.ServiceMapper;
 import com.tmyx.backend.util.FileUtil;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;

@@ -3,7 +3,7 @@ package com.tmyx.backend.controller;
 
 import com.tmyx.backend.entity.Comment;
 import com.tmyx.backend.mapper.CommentMapper;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -5,7 +5,7 @@ import com.tmyx.backend.entity.ServiceArea;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.AreaMapper;
 import com.tmyx.backend.mapper.UserMapper;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

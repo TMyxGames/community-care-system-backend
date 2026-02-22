@@ -4,7 +4,7 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.entity.Article;
 import com.tmyx.backend.mapper.ArticleMapper;
 import com.tmyx.backend.util.FileUtil;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

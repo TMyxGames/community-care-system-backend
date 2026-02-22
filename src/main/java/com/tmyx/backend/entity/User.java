@@ -2,6 +2,7 @@ package com.tmyx.backend.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 
+import java.util.Date;
 import java.util.List;
 
 public class User {
@@ -9,6 +10,7 @@ public class User {
     private String username;
     private String realName;
     private String sex;
+    private Date birthday;
     private String password;
     private String email;
     private String avatarUrl;
@@ -43,6 +45,10 @@ public class User {
     public String getSex() { return sex; }
 
     public void setSex(String sex) { this.sex = sex; }
+
+    public Date getBirthday() { return birthday; }
+
+    public void setBirthday(Date birthday) { this.birthday = birthday; }
 
     public String getPassword() {
         return password;
@@ -95,6 +101,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
+                ", birthday='" + birthday + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +

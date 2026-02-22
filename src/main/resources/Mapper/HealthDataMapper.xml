@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tmyx.backend.mapper.HealthDataMapper">
+
+    <select id="findBSLatestData" resultType="com.tmyx.backend.dto.BloodSugarDto">
+        (SELECT
+             id,
+             user_id as userId,
+             blood_sugar as bloodSugar,
+             meal_status as mealStatus,
+             record_date as recordDate
+         FROM health_data_bs
+         WHERE user_id = #{userId} AND meal_status = 0
+         ORDER BY record_date DESC
+             LIMIT 1)
+
+        UNION ALL
+
+        (SELECT
+             id,
+             user_id as userId,
+             blood_sugar as bloodSugar,
+             meal_status as mealStatus,
+             record_date as recordDate
+         FROM health_data_bs
+         WHERE user_id = #{userId} AND meal_status = 1
+         ORDER BY record_date DESC
+             LIMIT 1)
+    </select>
+
+</mapper>

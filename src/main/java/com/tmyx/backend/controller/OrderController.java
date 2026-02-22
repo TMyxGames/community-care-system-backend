@@ -2,14 +2,11 @@ package com.tmyx.backend.controller;
 
 
 import com.tmyx.backend.entity.Order;
-import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.OrderMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.DispatchService;
-import com.tmyx.backend.util.Result;
-import org.apache.ibatis.annotations.Select;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;

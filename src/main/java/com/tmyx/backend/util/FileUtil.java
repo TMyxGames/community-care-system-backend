@@ -1,5 +1,7 @@
 package com.tmyx.backend.util;
 
+import com.tmyx.backend.common.exception.CustomException;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,16 +35,12 @@ public class FileUtil {
             System.out.println("尝试删除文件，物理路径为: " + file.getAbsolutePath());
 
             if (file.exists() && file.isFile()) {
-                if (file.delete()) {
-                    System.out.println("文件删除成功: " + file.getAbsolutePath());
-                } else {
-                    System.err.println("文件删除失败: " + file.getAbsolutePath());
-                }
-            } else {
-                System.err.println("文件不存在或无法删除: " + file.getAbsolutePath());
+                file.delete();
             }
+        } catch (java.net.MalformedURLException e) {
+            System.err.println("文件URL格式非法: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("文件删除异常: " + e.getMessage());
+            System.err.println("文件删除失败: " + e.getMessage());
         }
     }
 

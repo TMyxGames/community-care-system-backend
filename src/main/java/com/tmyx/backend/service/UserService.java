@@ -27,6 +27,8 @@ public class UserService {
     @Autowired
     private RedisLocationService redisLocationService;
 
+    // 获取用户基本信息
+
     // 根据关键词搜索用户（id、用户名、真实姓名)
     public List<User> searchUsers(String keyword, Integer currentUserId) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -50,7 +52,6 @@ public class UserService {
 
         return dto;
     }
-
 
     // 获取带有服务的人员列表
     public List<User> getStaffList() {

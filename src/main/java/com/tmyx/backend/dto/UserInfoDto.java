@@ -1,5 +1,6 @@
 package com.tmyx.backend.dto;
 
+// 该dto用于消息列表的用户信息显示
 public class UserInfoDto {
     private Integer id; // 对方用户id
     private String username; // 对方用户名

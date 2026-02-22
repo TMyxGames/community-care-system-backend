@@ -4,7 +4,7 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.entity.Session;
 import com.tmyx.backend.mapper.SessionMapper;
 import com.tmyx.backend.service.SessionService;
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

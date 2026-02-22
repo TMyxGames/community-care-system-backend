@@ -5,11 +5,10 @@ import com.tmyx.backend.dto.StaffConfigDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.tmyx.backend.util.Result;
+import com.tmyx.backend.common.Result;
 import java.util.List;
 
 @RestController
