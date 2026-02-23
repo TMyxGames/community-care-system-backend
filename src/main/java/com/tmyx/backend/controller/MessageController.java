@@ -2,7 +2,9 @@ package com.tmyx.backend.controller;
 
 
 import com.tmyx.backend.dto.UserInfoDto;
+import com.tmyx.backend.dto.WebSocketResult;
 import com.tmyx.backend.entity.User;
+import com.tmyx.backend.handler.MessageHandler;
 import com.tmyx.backend.mapper.MessageMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -21,15 +24,9 @@ import java.util.concurrent.TimeUnit;
 @CrossOrigin
 public class MessageController {
     @Autowired
-    private MessageMapper messageMapper;
-    @Autowired
     private MessageService messageService;
     @Autowired
-    private MailService mailService;
-    @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private RedisTemplate<Object, Object> redisTemplate;
 
     // 根据会话获取消息列表
     @GetMapping("/list/{sessionId}")
@@ -83,60 +80,6 @@ public class MessageController {
 
         messageService.handleUnbind(userId, targetId);
         return Result.success();
-    }
-
-    // 发送安全告警邮件（离开安全区域）
-    @PostMapping("/safety-alarm")
-    public Result safetyAlarm(@RequestBody Map<String, Integer> params) {
-        // 获取老人id
-        Integer userId = params.get("userId");
-        // 定义redis冷却时间key
-        String lockKey = "alarm_lock:" + userId;
-        // 尝试写入锁
-        Boolean isLocked = redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, "locked", 5, TimeUnit.MINUTES);
-        // 如果获取锁失败，则冷却未到
-        if (Boolean.FALSE.equals(isLocked)) {
-            return Result.error("该用户处于告警冷却期，暂不发送告警邮件");
-        }
-
-        // 获取老人的信息
-        User elder = userMapper.findById(userId);
-        // 找到所有关注该老人的家属
-        List<UserInfoDto> followers = userMapper.findFollowersInfoByElderId(userId);
-        // 循环发送邮件给每个家属
-        for (UserInfoDto follower : followers) {
-            if (follower.getEmail() != null) {
-                try {
-                    mailService.sendAlarmMail(follower.getEmail(), elder.getRealName());
-                } catch (Exception e) {
-                    // 记录错误但不阻塞其他人的邮件发送
-                    System.err.println("发送给 " + follower.getEmail() + " 的告警邮件失败");
-                }
-            }
-        }
-
-        return Result.success("告警通知已下发");
-    }
-
-    // 发送返回邮件（返回安全区域）
-    @PostMapping("/back-to-safety")
-    public Result backToSafety(@RequestBody Map<String, Integer> body) {
-        // 获取老人id
-        Integer elderId = body.get("userId");
-        // 删除redis冷却锁
-        String lockKey = "alarm_lock:" + elderId;
-        redisTemplate.delete(lockKey);
-        // 发送报返回邮件
-        User elder = userMapper.findById(elderId);
-        List<UserInfoDto> followers = userMapper.findFollowersInfoByElderId(elderId);
-        // 循环发送邮件给每个家属
-        for (UserInfoDto follower : followers) {
-            if (follower.getEmail() != null) {
-                mailService.sendBackToSafetyMail(follower.getEmail(), elder.getRealName());
-            }
-        }
-        return Result.success("平安消息已发送，告警锁定已解除");
     }
 
 }
