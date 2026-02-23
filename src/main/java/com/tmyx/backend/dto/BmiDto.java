@@ -6,6 +6,7 @@ public class BmiDto {
     private Integer userId;
     private Double height;
     private Double weight;
+    private Double bmi;
     private Date recordDate;
 
     public Integer getUserId() {
@@ -32,6 +33,14 @@ public class BmiDto {
         this.weight = weight;
     }
 
+    public Double getBmi() {
+        return bmi;
+    }
+
+    public void setBmi(Double bmi) {
+        this.bmi = bmi;
+    }
+
     public Date getRecordDate() {
         return recordDate;
     }
@@ -46,6 +55,7 @@ public class BmiDto {
                 "userId=" + userId +
                 ", height=" + height +
                 ", weight=" + weight +
+                ", bmi=" + bmi +
                 ", recordDate=" + recordDate +
                 '}';
     }

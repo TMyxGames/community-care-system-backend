@@ -15,10 +15,6 @@ public class UserHealthVo {
     private String sex;
     private String avatarUrl;
 
-//    private HealthDataBMI latestBmi;
-//    private HealthDataBP latestBp;
-//    private HealthDataBS latestBs;
-
     private BmiDto latestBmi;
     private BloodPressureDto latestBp;
     private BloodSugarDto latestFastingBs;
@@ -71,31 +67,6 @@ public class UserHealthVo {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
-
-//    public HealthDataBMI getLatestBmi() {
-//        return latestBmi;
-//    }
-//
-//    public void setLatestBmi(HealthDataBMI latestBmi) {
-//        this.latestBmi = latestBmi;
-//    }
-//
-//    public HealthDataBP getLatestBp() {
-//        return latestBp;
-//    }
-//
-//    public void setLatestBp(HealthDataBP latestBp) {
-//        this.latestBp = latestBp;
-//    }
-//
-//    public HealthDataBS getLatestBs() {
-//        return latestBs;
-//    }
-//
-//    public void setLatestBs(HealthDataBS latestBs) {
-//        this.latestBs = latestBs;
-//    }
-
 
     public BmiDto getLatestBmi() {
         return latestBmi;

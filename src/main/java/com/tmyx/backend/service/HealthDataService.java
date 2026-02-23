@@ -87,4 +87,54 @@ public class HealthDataService {
 
         return summary;
     }
+
+    // 构造AI提示词
+    public String generateAiPrompt(Integer targetId) {
+        UserHealthVo summary = this.getAllHealthData(targetId);
+
+        StringBuilder sb = new StringBuilder();
+        // 设定身份和背景
+        sb.append("你是一位资深的养老健康管理专家。请根据以下老人的健康数据进行深度分析：\n\n");
+        // 注入基本信息
+        sb.append(String.format("【基本信息】性别：%s，年龄：%d岁\n",
+                "1".equals(summary.getSex()) ? "男" : "女", summary.getAge()));
+        // 注入bmi数据
+        sb.append("【当前指标】\n");
+        if (summary.getLatestBmi() != null) {
+            sb.append(String.format("- BMI指数: %.1f (属于%s)\n",
+                    summary.getLatestBmi().getBmi(),
+                    getBmiStatus(summary.getLatestBmi().getBmi())));
+        }
+        // 注入血压数据
+        if (summary.getLatestBp() != null) {
+            sb.append(String.format("- 最新血压: %d/%d mmHg\n",
+                    summary.getLatestBp().getSystolic(),
+                    summary.getLatestBp().getDiastolic()));
+        }
+        // 注入血糖数据
+        if (summary.getLatestFastingBs() != null) {
+            sb.append(String.format("- 最新空腹血糖: %.1f mmol/L\n",
+                    summary.getLatestFastingBs().getBloodSugar()));
+        }
+        if (summary.getLatestPostprandialBs() != null) {
+            sb.append(String.format("- 最新餐后血糖: %.1f mmol/L\n",
+                    summary.getLatestPostprandialBs().getBloodSugar()));
+        }
+        // 根据老年人生理特点进行预测
+        sb.append("\n【任务要求】\n");
+        sb.append("1. 分析现状：结合老年人标准（注意：老年人血压血糖标准较中青年稍宽），评价当前指标是否健康。\n");
+        sb.append("2. 健康预测：若保持当前生活习惯，预测未来 1-3 个月可能存在的健康风险（如心血管、糖尿病风险等）。\n");
+        sb.append("3. 个性化建议：给出针对性的饮食、运动和日常起居建议。\n");
+        sb.append("\n要求：语气亲切尊重，多用‘您’，避免生硬的医学术语，字数 250 字左右。");
+
+        return sb.toString();
+    }
+
+    // 计算bmi状态
+    private String getBmiStatus(double bmi) {
+        if (bmi < 18.5) return "偏瘦";
+        if (bmi < 24) return "正常";
+        if (bmi < 28) return "偏胖";
+        return "肥胖";
+    }
 }
