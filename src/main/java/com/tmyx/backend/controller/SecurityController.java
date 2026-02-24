@@ -33,6 +33,13 @@ public class SecurityController {
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
+    // 获取告警状态
+    @GetMapping("/alarm-status/{elderId}")
+    public Result getAlarmStatus(@PathVariable Integer elderId) {
+        Map<String, Object> status = securityService.getAlarmStatus(elderId);
+        return Result.success(status);
+    }
+
     // 发送安全告警邮件（离开安全区域）
     @PostMapping("/safety-alarm")
     public Result safetyAlarm(@RequestBody Map<String, Integer> params) {
@@ -51,6 +58,7 @@ public class SecurityController {
     public Result backToSafety(@RequestBody Map<String, Integer> body) {
         // 获取老人id
         Integer elderId = body.get("userId");
+        System.out.println("用户返回安全区域：" + elderId);
         // 删除redis告警计数key和告警时间key
         redisTemplate.delete("alarm_count:" + elderId);
         redisTemplate.delete("last_alarm_time:" + elderId);

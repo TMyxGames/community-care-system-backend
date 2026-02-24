@@ -10,6 +10,7 @@ import com.tmyx.backend.mapper.EmergencyCallMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,6 +30,33 @@ public class SecurityService {
     private EmergencyCallMapper emergencyCallMapper;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+
+    // 获取告警状态
+    public Map<String, Object> getAlarmStatus(Integer elderId) {
+        Map<String, Object> status = new HashMap<>();
+        // 检查是否在静默期
+        String silenceKey = "silence_mode:" + elderId;
+        Boolean isSilenced = redisTemplate.hasKey(silenceKey);
+        status.put("isSilenced", isSilenced);
+        // 获取当前的告警阶段
+        String countKey = "alarm_count:" + elderId;
+        Object countObj = redisTemplate.opsForValue().get(countKey);
+        int stage = 0;
+        if (countObj != null) {
+            stage = Integer.parseInt(countObj.toString());
+        }
+        status.put("stage", stage);
+        // 是否处于活跃告警状态
+        // 如果 stage > 0 且没有被静默，则认为前端需要恢复告警 UI
+        status.put("isAlarming", stage > 0 && !isSilenced);
+        // 获取剩余静默时间（用于前端显示倒计时）
+        if (isSilenced) {
+            Long expire = redisTemplate.getExpire(silenceKey, TimeUnit.MINUTES);
+            status.put("silenceMinutesLeft", expire);
+        }
+
+        return status;
+    }
 
     // 处理安全告警
     public Map<String, Object> processSafetyAlarm(Integer userId) {
