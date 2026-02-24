@@ -1,5 +1,6 @@
 package com.tmyx.backend.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class HealthDataBS {
@@ -7,7 +8,7 @@ public class HealthDataBS {
     private Integer userId;
     private Double bloodSugar;
     private Integer mealStatus;
-    private Date recordDate;
+    private LocalDateTime recordDate;
 
     public Integer getId() {
         return id;
@@ -41,11 +42,11 @@ public class HealthDataBS {
         this.mealStatus = mealStatus;
     }
 
-    public Date getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(Date recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 

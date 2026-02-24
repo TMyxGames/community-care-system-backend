@@ -1,5 +1,6 @@
 package com.tmyx.backend.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BloodPressureDto {
@@ -7,7 +8,7 @@ public class BloodPressureDto {
     private Integer heartRate;
     private Integer systolic;
     private Integer diastolic;
-    private Date recordDate;
+    private LocalDateTime recordDate;
 
     public Integer getUserId() {
         return userId;
@@ -41,11 +42,11 @@ public class BloodPressureDto {
         this.diastolic = diastolic;
     }
 
-    public Date getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(Date recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 

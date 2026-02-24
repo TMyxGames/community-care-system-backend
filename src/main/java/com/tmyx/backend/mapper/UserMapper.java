@@ -17,7 +17,7 @@ public interface UserMapper {
 
     // 根据id查询用户
     @Select("select * from user where id=#{id}")
-    public User findById(int id);
+    public User findById(Integer id);
 
     // 根据用户名查询用户
     @Select("select * from user where username=#{username}")
@@ -33,7 +33,7 @@ public interface UserMapper {
 
     // 根据用户身份查询用户
     @Select("select * from user where role=#{role}")
-    public List<User> findByRole(int role);
+    public List<User> findByRole(Integer role);
 
     // 查询所有管理员
     @Select("select * from user where role=1")
@@ -60,7 +60,7 @@ public interface UserMapper {
 
     // 删除用户
     @Delete("delete from user where id=#{id}")
-    public int delete(int id);
+    public int delete(Integer id);
 
     // 更新基础账户数据
     @Update("update user set username=#{username}, real_name=#{realName}, sex=#{sex} where id = #{id}")
@@ -68,7 +68,7 @@ public interface UserMapper {
 
     // 更新密码
     @Update("update user set password=#{password} where id = #{id}")
-    public int updatePassword(User user);
+    public int updatePassword(Integer id, String password);
 
     // 更新头像
     @Update("update user set avatar_url=#{avatarUrl} where id = #{id}")

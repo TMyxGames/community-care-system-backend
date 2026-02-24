@@ -1,12 +1,13 @@
 package com.tmyx.backend.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BloodSugarDto {
     private Integer userId;
     private Double bloodSugar;
     private Integer mealStatus;
-    private Date recordDate;
+    private LocalDateTime recordDate;
 
     public Integer getUserId() {
         return userId;
@@ -32,11 +33,11 @@ public class BloodSugarDto {
         this.mealStatus = mealStatus;
     }
 
-    public Date getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(Date recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 

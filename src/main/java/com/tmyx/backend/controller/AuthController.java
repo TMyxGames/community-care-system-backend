@@ -6,12 +6,15 @@ import com.tmyx.backend.dto.UserLoginDto;
 import com.tmyx.backend.dto.UserRegiDto;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
+import com.tmyx.backend.service.SessionService;
+import com.tmyx.backend.service.UserService;
 import com.tmyx.backend.util.FileUtil;
 import com.tmyx.backend.util.JwtUtil;
 import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,12 +32,16 @@ import java.util.concurrent.TimeUnit;
 public class AuthController {
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private MailService mailService;
-
+    @Autowired
+    private SessionService sessionService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     // 未来需要更改为相对路径
     @Value("${file.upload-path}")
@@ -72,13 +79,19 @@ public class AuthController {
         if (!realCode.equals(userInputCode)) {
             return Result.error("验证码错误");
         }
+        // 将明文密码加密
+        String encodedPassword = passwordEncoder.encode(regiDto.getPassword());
         // 保存用户信息到数据库
         User user = new User();
         user.setUsername(regiDto.getUsername());
-        user.setPassword(regiDto.getPassword());
+        user.setPassword(encodedPassword);
         user.setEmail(regiDto.getEmail());
         user.setRole(regiDto.getRole() != null ? regiDto.getRole() : 0);
         userMapper.insert(user);
+        // 初始化站内信会话
+        sessionService.initDefaultSessions(user.getId());
+        // 上传默认头像
+        userService.setDefaultAvatar(user.getId());
         // 删除 Redis 中的验证码
         redisTemplate.delete("CAPTCHA:" + email);
         // 返回结果
@@ -94,7 +107,27 @@ public class AuthController {
             return Result.error(401, "用户不存在");
         }
         // 校验密码
-        if (!user.getPassword().equals(loginDto.getPassword())) {
+        String dbPassword = user.getPassword();
+        String rawPassword = loginDto.getPassword();
+        boolean loginSuccess = false;
+        if (dbPassword != null && dbPassword.startsWith("$2a$")) {
+            // 尝试哈希匹配
+            if (passwordEncoder.matches(rawPassword, dbPassword)) {
+                loginSuccess = true;
+            }
+        } else {
+            // 如果不是哈希值，则进行明文匹配（迁移老用户的明文密码）
+            if (rawPassword.equals(dbPassword)) {
+                loginSuccess = true;
+                // 将明文密码进行哈希加密
+                String encodedPassword = passwordEncoder.encode(rawPassword);
+                // 将加密后的密码更新回数据库
+                userMapper.updatePassword(user.getId(), encodedPassword);
+                System.out.println("用户 " + user.getEmail() + " 的密码已自动升级为BCrypt加密存储");
+            }
+        }
+        // 如果两种方式都匹配失败，返回401
+        if (!loginSuccess) {
             return Result.error(401, "密码错误");
         }
         // 校验用户身份

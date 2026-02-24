@@ -19,12 +19,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "/auth/login",          // 登录
                         "/auth/register",       // 注册
                         "/auth/sendCaptcha",    // 发送验证码
-                        "/carousel/**",        // 获取轮播图
-                        "/carousel/all",
-                        "/service/**",         // 获取服务数据
-                        "/service/all",
-                        "/user/avatars/**",            // 获取用户头像
-                        "/files/**"             // 文件路径映射
+
+                        "/files/**",            // 文件路径映射
+                        "/carousel/all",        // 获取轮播图
+                        "/service/all",         // 获取服务
+                        "/service/**",          // 获取服务详情
+                        "/article/published",   // 获取已发布文章
+                        "/article/get/**",      // 获取文章内容
+                        "/comment",      // 获取服务评论
+                        "/user/avatars/**"      // 获取用户头像
+
                 );
     }
 }

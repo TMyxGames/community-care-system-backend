@@ -3,6 +3,7 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.dto.BloodPressureDto;
 import com.tmyx.backend.dto.BloodSugarDto;
 import com.tmyx.backend.dto.BmiDto;
+import com.tmyx.backend.dto.HealthDataDto;
 import com.tmyx.backend.entity.HealthDataBMI;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.HealthDataMapper;
@@ -13,6 +14,7 @@ import com.tmyx.backend.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,10 +31,65 @@ public class HealthController {
     private HealthAiService healthAiService;
 
     // 上传健康数据
-    @PostMapping("/upload")
-    public String upload(@RequestBody HealthDataBMI data) {
-        healthDataMapper.insert(data);
-        return "数据上传成功";
+    @PostMapping("/add")
+    public Result addHealthData(@RequestBody HealthDataDto request) {
+        if (request.getUserId() == null || request.getType() == null) {
+            return Result.error("参数不全");
+        }
+        // 默认记录时间
+        if (request.getRecordDate() == null) {
+            request.setRecordDate(LocalDateTime.now());
+        }
+        try {
+            switch (request.getType()) {
+                case "blood_pressure":
+                    // 组装并调用血压插入
+                    BloodPressureDto bpDto = new BloodPressureDto();
+                    bpDto.setUserId(request.getUserId());
+                    bpDto.setSystolic(request.getSystolic());
+                    bpDto.setDiastolic(request.getDiastolic());
+                    bpDto.setHeartRate(request.getHeartRate());
+                    bpDto.setRecordDate(request.getRecordDate());
+                    healthDataMapper.insertBP(bpDto);
+                    break;
+
+                case "blood_sugar":
+                    // 组装并调用血糖插入
+                    BloodSugarDto bsDto = new BloodSugarDto();
+                    bsDto.setUserId(request.getUserId());
+                    bsDto.setBloodSugar(request.getBloodSugar());
+                    bsDto.setMealStatus(request.getMealStatus());
+                    bsDto.setRecordDate(request.getRecordDate());
+                    healthDataMapper.insertBS(bsDto);
+                    break;
+
+                case "bmi":
+                    // 组装并调用bmi插入
+                    BmiDto bmiDto = new BmiDto();
+                    bmiDto.setUserId(request.getUserId());
+                    bmiDto.setHeight(request.getHeight());
+                    bmiDto.setWeight(request.getWeight());
+                    bmiDto.setRecordDate(request.getRecordDate());
+                    // 根据dto里的身高和体重计算bmi
+                    if (request.getHeight() != null && request.getWeight() != null && request.getHeight() > 0) {
+                        double heightInMeters = request.getHeight() / 100.0;
+                        double bmiValue = request.getWeight() / (heightInMeters * heightInMeters);
+                        // 保留两位小数
+                        bmiValue = Math.round(bmiValue * 100.0) / 100.0;
+                        bmiDto.setBmi(bmiValue);
+                    } else {
+                        return Result.error("身高或体重数据异常，无法计算");
+                    }
+                    healthDataMapper.insertBMI(bmiDto);
+                    break;
+
+                default:
+                    return Result.error("未知的健康数据类型: " + request.getType());
+            }
+            return Result.success("记录成功");
+        } catch (Exception e) {
+            return Result.error("数据库写入失败: " + e.getMessage());
+        }
     }
 
     // 获取用户最新健康数据

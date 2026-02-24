@@ -1,5 +1,6 @@
 package com.tmyx.backend.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BmiDto {
@@ -7,7 +8,7 @@ public class BmiDto {
     private Double height;
     private Double weight;
     private Double bmi;
-    private Date recordDate;
+    private LocalDateTime recordDate;
 
     public Integer getUserId() {
         return userId;
@@ -41,11 +42,11 @@ public class BmiDto {
         this.bmi = bmi;
     }
 
-    public Date getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(Date recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 

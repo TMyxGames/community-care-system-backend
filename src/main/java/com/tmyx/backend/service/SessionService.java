@@ -25,7 +25,7 @@ public class SessionService {
     }
 
     // 初始化默认会话
-    private void initDefaultSessions(Integer userId) {
+    public void initDefaultSessions(Integer userId) {
         int[] types = {0, 1, 2};
         String[] names = {"系统通知", "绑定请求", "安全提醒"};
 

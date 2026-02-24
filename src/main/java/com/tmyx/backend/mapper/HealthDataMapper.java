@@ -16,43 +16,46 @@ import java.util.List;
 @Mapper
 public interface HealthDataMapper {
 
-    // 插入健康数据
-    @Insert("insert into health_data(user_id, age, " +
-            "height, weight, heart_rate, systolic, diastolic, blood_sugar, record_date)" +
-            "values(#{userId}, #{age}, #{height}, #{weight}, " +
-            "#{hearRate}, #{systolic}, #{diastolic}, #{bloodSugar}, now())")
-    public int insert(HealthDataBMI data);
-
-    // 根据id获取用户全部健康数据
-    @Select("select * from health_data where user_id=#{userId} order by record_date desc")
-    public List<HealthDataBMI> findByUserId(@Param("userId") Integer userId);
-
-    // 根据id获取用户特定天数的最新健康数据
-    @Select("select * from health_data where user_id= #{userId} order by record_date desc limit #{limit}")
-    public List<HealthDataBMI> findLatestData(@Param("userId") Integer userId, @Param("limit") Integer limit);
-
-    // 根据id获取用户指定时间段的健康数据
-    @Select("select * from health_data where user_id= #{userId} and record_date between #{startDate} and #{endDate}")
-    public List<HealthDataBMI> findByUserIdAndDate(@Param("userId") Integer userId,
-                                                   @Param("startDate") String startDate,
-                                                   @Param("endDate") String endDate);
+//    // 插入健康数据
+//    @Insert("insert into health_data(user_id, age, " +
+//            "height, weight, heart_rate, systolic, diastolic, blood_sugar, record_date)" +
+//            "values(#{userId}, #{age}, #{height}, #{weight}, " +
+//            "#{hearRate}, #{systolic}, #{diastolic}, #{bloodSugar}, now())")
+//    public int insert(HealthDataBMI data);
+//
+//    // 根据id获取用户全部健康数据
+//    @Select("select * from health_data where user_id=#{userId} order by record_date desc")
+//    public List<HealthDataBMI> findByUserId(@Param("userId") Integer userId);
+//
+//    // 根据id获取用户特定天数的最新健康数据
+//    @Select("select * from health_data where user_id= #{userId} order by record_date desc limit #{limit}")
+//    public List<HealthDataBMI> findLatestData(@Param("userId") Integer userId, @Param("limit") Integer limit);
+//
+//    // 根据id获取用户指定时间段的健康数据
+//    @Select("select * from health_data where user_id= #{userId} and record_date between #{startDate} and #{endDate}")
+//    public List<HealthDataBMI> findByUserIdAndDate(@Param("userId") Integer userId,
+//                                                   @Param("startDate") String startDate,
+//                                                   @Param("endDate") String endDate);
 
 
 
     // 插入bmi数据
-    @Insert("insert into health_data_bmi(user_id, height, weight, record_date) " +
-            "values(#{userId}, #{height}, #{weight}, coalesce(#{recordDate, }now()))")
-    public int insertBMI(HealthDataBMI data);
+    @Insert("insert into health_data_bmi(user_id, height, weight, bmi, record_date) " +
+            "values(#{userId}, #{height}, #{weight}, #{bmi}, #{recordDate})")
+//    public int insertBMI(HealthDataBMI data);
+    public int insertBMI(BmiDto data);
 
     // 插入血压数据
     @Insert("insert into health_data_bp(user_id, heart_rate, systolic, diastolic, record_date) " +
-            "values(#{userId}, #{heartRate}, #{systolic}, #{diastolic}, coalesce(#{recordDate, }now()))")
-    public int insertBP(HealthDataBP data);
+            "values(#{userId}, #{heartRate}, #{systolic}, #{diastolic}, #{recordDate})")
+//    public int insertBP(HealthDataBP data);
+    public int insertBP(BloodPressureDto data);
 
     // 插入血糖数据
     @Insert("insert into health_data_bs(user_id, blood_sugar, meal_status, record_date)" +
-            " values(#{userId}, #{bloodSugar}, #{mealStatus}, coalesce(#{recordDate, }now()))")
-    public int insertBS(HealthDataBS data);
+            " values(#{userId}, #{bloodSugar}, #{mealStatus}, #{recordDate})")
+//    public int insertBS(HealthDataBS data);
+    public int insertBS(BloodSugarDto data);
 
 
 
