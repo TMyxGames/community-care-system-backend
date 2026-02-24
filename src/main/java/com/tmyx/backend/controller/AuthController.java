@@ -218,4 +218,18 @@ public class AuthController {
         }
         return Result.error("更新用户信息失败");
     }
+
+    // 修改密码
+    @PutMapping("/password")
+    public Result updatePassword(@RequestBody Map<String, String> params, @RequestAttribute Integer userId) {
+        String oldPassword = params.get("oldPassword");
+        String newPassword = params.get("newPassword");
+        // 查询用户信息，校验旧密码是否正确
+        User user = userMapper.findById(userId);
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return Result.error(401, "旧密码错误");
+        }
+        userMapper.updatePassword(userId, passwordEncoder.encode(newPassword));
+        return Result.success();
+    }
 }
