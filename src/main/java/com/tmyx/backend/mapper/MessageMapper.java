@@ -13,6 +13,13 @@ public interface MessageMapper {
     public List<Message> findBySessionId(@Param("sessionId") Integer sessionId,
                                          @Param("currentUserId") Integer currentUserId);
 
+    // 根据会话id获取历史消息
+    // 来自MessageMapper.xml
+    List<Message> selectHistory(@Param("sessionId") Integer sessionId,
+                                @Param("currentUserId") Integer currentUserId,
+                                @Param("beforeId") Integer beforeId,
+                                @Param("limit") Integer limit);
+
     // 插入一条消息
     @Insert("insert into message(from_session_id, to_session_id, from_id, to_id, content, type, status, send_time) " +
             "values(#{fromSessionId}, #{toSessionId}, #{fromId}, #{toId}, #{content}, #{type}, #{status}, #{sendTime})")

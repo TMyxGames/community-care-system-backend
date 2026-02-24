@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class MessageService {
     @Autowired
     private MessageHandler messageHandler;
 
-    // 获取会话详情
+    // 获取会话的消息记录
     public List<?> getMessagesBySession(Integer sessionId, Integer userId) {
         Session session = sessionMapper.findById(sessionId);
         if (session == null || !session.getUserId().equals(userId)) {
@@ -44,8 +45,25 @@ public class MessageService {
         if (session.getType() == 0) {
             return systemNoticeMapper.findAllOrderByTime();
         } else {
-            return messageMapper.findBySessionId(sessionId, userId);
+            List<Message> list = messageMapper.findBySessionId(sessionId, userId);
+            Collections.reverse(list);
+            return list;
         }
+
+    }
+
+    // 获取会话的历史消息记录
+    public List<Message> getMessageHistory(Integer sessionId, Integer userId, Integer beforeId, Integer limit) {
+        Session session = sessionMapper.findById(sessionId);
+        if (session == null || !session.getUserId().equals(userId)) {
+            throw new RuntimeException("会话不存在或无权访问");
+        }
+
+        List<Message> list = messageMapper.selectHistory(sessionId, userId, beforeId, limit);
+
+        Collections.reverse(list);
+
+        return list;
     }
 
     // 发送绑定请求

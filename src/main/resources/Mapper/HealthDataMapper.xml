@@ -14,7 +14,7 @@
          FROM health_data_bs
          WHERE user_id = #{userId} AND meal_status = 0
          ORDER BY record_date DESC
-             LIMIT 1)
+         LIMIT 1)
 
         UNION ALL
 
@@ -27,7 +27,7 @@
          FROM health_data_bs
          WHERE user_id = #{userId} AND meal_status = 1
          ORDER BY record_date DESC
-             LIMIT 1)
+         LIMIT 1)
     </select>
 
 </mapper>

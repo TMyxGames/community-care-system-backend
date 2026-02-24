@@ -4,6 +4,7 @@ package com.tmyx.backend.controller;
 import com.tmyx.backend.dto.UserInfoDto;
 import com.tmyx.backend.dto.WebSocketResult;
 import com.tmyx.backend.entity.User;
+import com.tmyx.backend.entity.Message;
 import com.tmyx.backend.handler.MessageHandler;
 import com.tmyx.backend.mapper.MessageMapper;
 import com.tmyx.backend.mapper.UserMapper;
@@ -28,10 +29,19 @@ public class MessageController {
     @Autowired
     private UserMapper userMapper;
 
-    // 根据会话获取消息列表
+    // 根据会话获取消息记录
     @GetMapping("/list/{sessionId}")
     public Result getMessagesBySession(@PathVariable Integer sessionId, @RequestAttribute Integer userId) {
         List<?> list = messageService.getMessagesBySession(sessionId, userId);
+        return Result.success(list);
+    }
+
+    // 根据会话获取历史消息记录
+    @GetMapping("/history/{sessionId}")
+    public Result getHistory(@PathVariable Integer sessionId, @RequestParam(required = false) Integer beforeId,
+                             @RequestParam(defaultValue = "20") Integer limit, @RequestAttribute Integer userId) {
+
+        List<Message> list = messageService.getMessageHistory(sessionId, userId, beforeId, limit);
         return Result.success(list);
     }
 
