@@ -8,6 +8,11 @@ import com.tmyx.backend.entity.User;
 import com.tmyx.backend.handler.MessageHandler;
 import com.tmyx.backend.mapper.EmergencyCallMapper;
 import com.tmyx.backend.mapper.UserMapper;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,6 +35,24 @@ public class SecurityService {
     private EmergencyCallMapper emergencyCallMapper;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+
+    private final GeometryFactory geometryFactory = new GeometryFactory();
+
+    // 检查位置是否在范围内
+    public boolean checkInArea(double lng, double lat, String wktPolygon) {
+        try {
+            WKTReader reader = new WKTReader(geometryFactory);
+            // 将字符串转换为多边形对象
+            Polygon polygon = (Polygon) reader.read(wktPolygon);
+            // 创建当前位置点
+            Point point = geometryFactory.createPoint(new Coordinate(lng, lat));
+            // 执行运算
+            return polygon.contains(point);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     // 获取告警状态
     public Map<String, Object> getAlarmStatus(Integer elderId) {

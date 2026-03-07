@@ -40,8 +40,6 @@ public class UserService {
     // 给新用户设置默认头像
     public void setDefaultAvatar(Integer userId) {
         try {
-            // 1. 准备你的默认头像文件，建议放在项目的 static/images/default_avatar.jpg
-            // 或者放在你配置的 upload 根目录下
             File defaultFile = new File( baseUploadPath, "default/兔兔.jpg");
 
             if (defaultFile.exists()) {

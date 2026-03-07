@@ -2,7 +2,7 @@ package com.tmyx.backend.entity;
 
 import java.util.Date;
 
-public class Comment {
+public class Evaluation {
     private Integer id;
     private Integer userId;
     private Integer orderId;

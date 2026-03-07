@@ -2,6 +2,9 @@ package com.tmyx.backend.config;
 
 import com.tmyx.backend.dto.LocationDto;
 import com.tmyx.backend.entity.Location;
+import com.tmyx.backend.entity.SafeArea;
+import com.tmyx.backend.entity.ServiceArea;
+import com.tmyx.backend.mapper.AreaMapper;
 import com.tmyx.backend.mapper.LocationMapper;
 import com.tmyx.backend.service.RedisLocationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ public class DataInitializer implements ApplicationRunner {
     @Autowired
     private LocationMapper locationMapper;
     @Autowired
+    private AreaMapper areaMapper;
+    @Autowired
     private RedisLocationService redisLocationService;
 
     // 启动项目时将所有服务人员位置预热到redis
@@ -26,19 +31,20 @@ public class DataInitializer implements ApplicationRunner {
         try {
             // 从数据库查询所有服务人员的位置(role=2)
             List<LocationDto> staffLocations = locationMapper.findAllStaffLocations();
-            processPreheat("staff", staffLocations);
+            preheatLocations("staff", staffLocations);
 
             List<LocationDto> userLocations = locationMapper.findAllUserLocations();
-            processPreheat("user", userLocations);
+            preheatLocations("user", userLocations);
 
-
+            List<SafeArea> safeAreas = areaMapper.findAllSafeArea();
+            preheatSafeAreas("safe", safeAreas);
         } catch (Exception e) {
             System.err.println(">>> 数据预热失败，请检查数据库连接或 Redis 状态: " + e.getMessage());
         }
 
     }
 
-    private void processPreheat(String type, List<LocationDto> locations) {
+    private void preheatLocations(String type, List<LocationDto> locations) {
         if (locations != null && !locations.isEmpty()) {
             for (LocationDto loc : locations) {
                 // 调用RedisLocationService
@@ -49,6 +55,18 @@ public class DataInitializer implements ApplicationRunner {
                 );
             }
             System.out.println(">>> 成功预热 " + type + " 位置数据，共计：" + locations.size() + " 条");
+        }
+    }
+
+    private void preheatSafeAreas(String type, List<SafeArea> areas) {
+        if (areas != null && !areas.isEmpty()) {
+            for (SafeArea area : areas) {
+                redisLocationService.updateArea(
+                        type,
+                        area.getId(),
+                        area.getRegion());
+            }
+            System.out.println(">>> 成功预热围栏数据，共计：" + areas.size() + " 条");
         }
     }
 

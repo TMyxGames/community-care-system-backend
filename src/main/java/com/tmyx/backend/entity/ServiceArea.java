@@ -1,10 +1,13 @@
 package com.tmyx.backend.entity;
 
+import org.locationtech.jts.geom.Polygon;
+
 public class ServiceArea {
     private Integer id;
     private Integer adminId;
     private String areaName;
     private String scopePath;
+    private String region;
     private Double centerLng;
     private Double centerLat;
 
@@ -24,6 +27,10 @@ public class ServiceArea {
 
     public void setScopePath(String scopePath) { this.scopePath = scopePath; }
 
+    public String getRegion() { return region; }
+
+    public void setRegion(String region) { this.region = region; }
+
     public Double getCenterLng() { return centerLng; }
 
     public void setCenterLng(Double centerLng) { this.centerLng = centerLng; }
@@ -39,6 +46,7 @@ public class ServiceArea {
                 ", adminId=" + adminId +
                 ", areaName='" + areaName + '\'' +
                 ", scopePath='" + scopePath + '\'' +
+                ", region=" + region +
                 ", centerLng=" + centerLng +
                 ", centerLat=" + centerLat +
                 '}';

@@ -65,7 +65,7 @@ public class FileUtil {
     public static void cleanOrphanImages(String content, String articleId, String baseUploadPath) {
         if (content == null || articleId == null) return;
 
-        // 1. 提取源码中所有引用的文件名
+        // 提取源码中所有引用的文件名
         // 匹配格式如：/files/article/uuid/images/filename.png
         Set<String> activeImageNames = new HashSet<>();
         String regex = "/files/article/" + articleId + "/images/([^ )\"'\\n]+)";
@@ -76,7 +76,7 @@ public class FileUtil {
             activeImageNames.add(matcher.group(1)); // 提取文件名部分
         }
 
-        // 2. 定位物理文件夹：uploads/article/uuid/images/
+        // 定位物理文件夹：uploads/article/uuid/images/
         Path imagesDirPath = Paths.get(baseUploadPath, "article", articleId, "images");
         File imagesDir = imagesDirPath.toFile();
 
@@ -84,7 +84,7 @@ public class FileUtil {
             File[] files = imagesDir.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    // 3. 如果磁盘上的文件不在源码引用名单中，则删除
+                    // 如果磁盘上的文件不在源码引用名单中，则删除
                     if (!activeImageNames.contains(file.getName())) {
                         boolean deleted = file.delete();
                         if (deleted) {

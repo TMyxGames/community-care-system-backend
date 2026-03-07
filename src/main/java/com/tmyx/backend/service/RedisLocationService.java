@@ -18,6 +18,7 @@ public class RedisLocationService {
 
     // 基础前缀
     private static final String BASE_KEY = "location:cache:";
+    private static final String FENCE_KEY = "area:cache:";
 
     // 动态传入类型
     public void updateLocation(String type, Integer userId, LocationDto dto) {
@@ -57,5 +58,11 @@ public class RedisLocationService {
     // 清除某个类别的位置信息
     public void clearType(String type) {
         redisTemplate.delete(BASE_KEY + type);
+    }
+
+    // 缓存区域信息
+    public void updateArea(String type, Integer areaId, String wkt) {
+        String key = FENCE_KEY + type;
+        redisTemplate.opsForHash().put(key, areaId.toString(), wkt);
     }
 }

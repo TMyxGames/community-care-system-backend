@@ -10,12 +10,13 @@ import java.util.List;
 public interface AreaMapper {
 
     // 插入新安全区域
-    @Insert("insert into safe_area(user_id, area_name, scope_path, center_lng, center_lat)" +
-            "values(#{userId}, #{areaName}, #{scopePath}, #{centerLng}, #{centerLat})")
+    @Insert("insert into safe_area(user_id, area_name, scope_path, region, center_lng, center_lat)" +
+            "values(#{userId}, #{areaName}, #{scopePath}, ST_GeomFromText(#{region}), #{centerLng}, #{centerLat})")
     public int insertSafeArea(SafeArea safeArea);
 
     // 查询所有安全区域
-    @Select("select * from safe_area")
+    @Select("select id, user_id, area_name, scope_path, ST_AsText(region) as region, " +
+            "center_lng, center_lat, is_active from safe_area")
     public List<SafeArea> findAllSafeArea();
 
     // 根据用户id查询安全区域（家属使用）
@@ -35,8 +36,8 @@ public interface AreaMapper {
     // ===================================================================
 
     // 插入新服务区域
-    @Insert("insert into service_area(admin_id, area_name, scope_path, center_lng, center_lat)" +
-            "values(#{adminId}, #{areaName}, #{scopePath}, #{centerLng}, #{centerLat})")
+    @Insert("insert into service_area(admin_id, area_name, scope_path, region, center_lng, center_lat)" +
+            "values(#{adminId}, #{areaName}, #{scopePath}, ST_GeomFromText(#{region}), #{centerLng}, #{centerLat})")
     public int insertServiceArea(ServiceArea serviceArea);
 
     // 查询所有服务区域

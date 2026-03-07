@@ -5,6 +5,7 @@ public class SafeArea {
     private Integer userId;
     private String areaName;
     private String scopePath;
+    private String region;
     private Double centerLng;
     private Double centerLat;
 
@@ -39,6 +40,10 @@ public class SafeArea {
     public void setScopePath(String scopePath) {
         this.scopePath = scopePath;
     }
+
+    public String getRegion() { return region; }
+
+    public void setRegion(String region) { this.region = region; }
 
     public Double getCenterLng() {
         return centerLng;

@@ -56,6 +56,7 @@ public interface UserMapper {
     // 插入用户
     @Insert("insert into user(username, real_name, sex, password, email, avatar_url, role, service_status, service_area_id)" +
             "values(#{username}, #{realName}, #{sex}, #{password}, #{email}, #{avatarUrl}, #{role}, #{serviceStatus}, #{serviceAreaId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insert(User user);
 
     // 删除用户

@@ -6,6 +6,7 @@ import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.AreaMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.common.Result;
+import com.tmyx.backend.util.GeometryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,9 @@ public class AreaController {
     // 添加服务区域
     @PostMapping("/service/add")
     public String addServiceArea(@RequestBody ServiceArea area) {
+        String region = GeometryUtil.parseScopePathToWkt(area.getScopePath());
+        area.setRegion(region);
+
         int result = areaMapper.insertServiceArea(area);
         if (result > 0) {
             return "添加成功";
