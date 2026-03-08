@@ -34,13 +34,14 @@ public class LocationController {
             Location loc = locationMapper.findByUserId(userId);
             if (loc == null) return Result.error("用户不存在");
 
-            dto = new LocationDto();
-            dto.setUserId(userId);
-            dto.setLng(loc.getLng());
-            dto.setLat(loc.getLat());
             // 补全姓名和头像
             User user = userMapper.findById(userId);
-            dto.setAvatarUrl(user.getAvatarUrl());
+
+            dto = new LocationDto(userId, loc.getLng(), loc.getLat(), user.getAvatarUrl());
+//            dto.setUserId(userId);
+//            dto.setLng(loc.getLng());
+//            dto.setLat(loc.getLat());
+
         }
 
         double step = 0.00001;

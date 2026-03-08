@@ -30,6 +30,8 @@ public class LocationSimulationService {
     private LocationMapper locationMapper;
     @Autowired
     private RedisLocationService redisLocationService;
+    @Autowired
+    private SecurityService securityService;
 
     // 查询所有服务人员位置
     public List<Location> getLocation() {
@@ -102,7 +104,11 @@ public class LocationSimulationService {
 
         rawData.forEach((k, v) -> {
             LocationDto dto = JSON.parseObject(v.toString(), LocationDto.class);
+            Integer userId = Integer.parseInt(k.toString());
             formattedData.put(k.toString(), dto);
+            // 执行监控方法
+            securityService.monitorElderLocation(userId, dto.getLng(), dto.getLat());
+            System.out.println("用户" + userId + "经纬度：" + dto.getLng() + "," + dto.getLat());
         });
 
         if (!formattedData.isEmpty()) {

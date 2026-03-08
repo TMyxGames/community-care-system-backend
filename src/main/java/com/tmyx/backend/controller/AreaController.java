@@ -73,6 +73,9 @@ public class AreaController {
     // 添加服务区域
     @PostMapping("/safe/add")
     public String addSafeArea(@RequestBody SafeArea area) {
+        String region = GeometryUtil.parseScopePathToWkt(area.getScopePath());
+        area.setRegion(region);
+
         int result = areaMapper.insertSafeArea(area);
         if (result > 0) {
             return "添加成功";

@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RedisLocationService {
@@ -18,15 +18,18 @@ public class RedisLocationService {
 
     // 基础前缀
     private static final String BASE_KEY = "location:cache:";
-    private static final String FENCE_KEY = "area:cache:";
 
-    // 动态传入类型
+    private static final String ELDER_BIND_KEY = "elder:areas:";
+    private static final String AREA_DATA_KEY = "area:cache:safe";
+
+    // 缓存位置信息
     public void updateLocation(String type, Integer userId, LocationDto dto) {
         String key = BASE_KEY + type;
         String jsonValue = JSON.toJSONString(dto, SerializerFeature.WriteNonStringKeyAsString);
         redisTemplate.opsForHash().put(key, userId.toString(), jsonValue);
     }
 
+    // 获取位置信息
     public LocationDto getLocationDto (String type, Integer userId) {
         String key = BASE_KEY + type;
         Object json = redisTemplate.opsForHash().get(key, userId.toString());
@@ -61,8 +64,25 @@ public class RedisLocationService {
     }
 
     // 缓存区域信息
-    public void updateArea(String type, Integer areaId, String wkt) {
-        String key = FENCE_KEY + type;
-        redisTemplate.opsForHash().put(key, areaId.toString(), wkt);
+    public void updateSafeArea(Integer elderId, Integer areaId, String wkt) {
+        // 存入安全区域数据
+        redisTemplate.opsForHash().put(AREA_DATA_KEY, areaId.toString(), wkt.trim());
+        // 存入老人与安全区域的绑定关系
+        redisTemplate.opsForSet().add(ELDER_BIND_KEY + elderId, areaId.toString());
+    }
+
+    // 获取老人所有安全区域
+    public List<String> getElderAllSafeAreaWkt(Integer elderId) {
+        // 获取老人相关的所有安全区域id
+        Set<String> areaIds = redisTemplate.opsForSet().members(ELDER_BIND_KEY + elderId);
+        if (areaIds == null || areaIds.isEmpty()) return new ArrayList<>();
+
+        // 批量获取安全区域wkt
+        List<Object> wktObjects = redisTemplate.opsForHash().multiGet(AREA_DATA_KEY, new ArrayList<>(areaIds));
+
+        return wktObjects.stream()
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 }

@@ -6,6 +6,13 @@ public class LocationDto {
     private Double lat;
     private String avatarUrl;
 
+    public LocationDto(Integer userId, Double lng, Double lat, String avatarUrl) {
+        this.userId = userId;
+        this.lng = lng;
+        this.lat = lat;
+        this.avatarUrl = avatarUrl;
+    }
+
     public Integer getUserId() {
         return userId;
     }

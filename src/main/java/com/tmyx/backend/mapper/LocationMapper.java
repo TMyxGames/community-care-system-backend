@@ -19,6 +19,10 @@ public interface LocationMapper {
     // 来自LocationMapper.xml
     public List<Location> findLocationsByUserIds(@Param("userIds") List<Integer> userIds);
 
+    // 根据用户id获取位置
+    // 来自LocationMapper.xml
+    public LocationDto findLocationByUserId(@Param("userId") Integer userId);
+
     // 获取所有普通用户的位置
     // 来自LocationMapper.xml
     public List<LocationDto> findAllUserLocations();

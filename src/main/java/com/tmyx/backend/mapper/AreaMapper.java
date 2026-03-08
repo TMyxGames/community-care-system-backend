@@ -24,7 +24,14 @@ public interface AreaMapper {
     public List<SafeArea> findSafeAreaByUserId(Integer userId);
 
     // 根据用户id查询已绑定用户的安全区域（老人使用）
-    @Select("select a.* from safe_area a " +
+    @Select("select a.id, " +
+            "a.user_id as userId, " +
+            "a.area_name as areaName, " +
+            "a.scope_path as scopePath, " +
+            "ST_AsText(a.region) as region, " +
+            "a.center_lng as centerLng, " +
+            "a.center_lat as centerLat " +
+            "from safe_area a " +
             "join binding b on a.user_id = b.follower_id " +
             "where b.elder_id = #{elderId}")
     public List<SafeArea> findSafeAreaByElderId(Integer elderId);

@@ -43,6 +43,10 @@ public interface UserMapper {
     @Select("select * from user where role=2")
     public List<User> findAllStaff();
 
+    // 查询所有老人的id
+    @Select("select id from user where role=3")
+    public List<Integer> findAllElderIds();
+
     // 根据关键词搜索用户（id、用户名、真实姓名)
     // 该方法来自UserMapper.xml
     List<User> searchUsers(@Param("keyword") String keyword, @Param("currentUserId") Integer currentUserId );
