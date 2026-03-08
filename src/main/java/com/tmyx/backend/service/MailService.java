@@ -26,10 +26,19 @@ public class MailService {
         mailSender.send(message);
     }
 
-    // 邮箱验证码
-    public void sendCaptchaMail(String to, String code) {
+    // 注册验证码
+    public void sendRegiCaptchaMail(String to, String code) {
         // 邮件主题
         String subject = "【注册验证码】社区智慧养老服务系统";
+        // 邮件内容
+        String content = "您的验证码为：" + code + "，有效期为5分钟，请勿告知他人。";
+        sendMail(to, subject, content);
+    }
+
+    // 重置密码验证码
+    public void sendResetCaptchaMail(String to, String code) {
+        // 邮件主题
+        String subject = "【重置密码】社区智慧养老服务系统";
         // 邮件内容
         String content = "您的验证码为：" + code + "，有效期为5分钟，请勿告知他人。";
         sendMail(to, subject, content);

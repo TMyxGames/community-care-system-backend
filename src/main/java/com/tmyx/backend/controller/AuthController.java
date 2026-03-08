@@ -1,5 +1,6 @@
 package com.tmyx.backend.controller;
 
+import com.tmyx.backend.dto.UserResetPwdDto;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.dto.UserBindDto;
 import com.tmyx.backend.dto.UserLoginDto;
@@ -47,15 +48,15 @@ public class AuthController {
     @Value("${file.upload-path}")
     private String baseUploadPath;
 
-    // 发送验证码
-    @PostMapping("/sendCaptcha")
-    public Result sendCaptcha(@RequestParam String email) {
+    // 发送注册验证码
+    @PostMapping("/sendRegiCaptcha")
+    public Result sendRegiCaptcha(@RequestParam String email) {
         // 生成验证码
         String captcha = String.valueOf((int) ((Math.random() * 9 + 1) * 100000));
         // 保存验证码到redis
-        redisTemplate.opsForValue().set("CAPTCHA:" + email, captcha, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("CAPTCHA:regi:" + email, captcha, 5, TimeUnit.MINUTES);
         // 发送邮件
-        mailService.sendCaptchaMail(email, captcha);
+        mailService.sendRegiCaptchaMail(email, captcha);
         // 返回结果
         return Result.success();
     }
@@ -66,7 +67,7 @@ public class AuthController {
         String email = regiDto.getEmail();
         String userInputCode = regiDto.getCaptcha();
         // 从redis中获取保存的验证码
-        String realCode = redisTemplate.opsForValue().get("CAPTCHA:" + email);
+        String realCode = redisTemplate.opsForValue().get("CAPTCHA:regi:" + email);
         // 校验用户是否存在（未来封装到Service里）
         if (userMapper.findByName(regiDto.getUsername()) != null) {
             return Result.error("用户名已存在");
@@ -93,7 +94,7 @@ public class AuthController {
         // 上传默认头像
         userService.setDefaultAvatar(user.getId());
         // 删除 Redis 中的验证码
-        redisTemplate.delete("CAPTCHA:" + email);
+        redisTemplate.delete("CAPTCHA:regi:" + email);
         // 返回结果
         return Result.success();
     }
@@ -219,7 +220,7 @@ public class AuthController {
         return Result.error("更新用户信息失败");
     }
 
-    // 修改密码
+    // 修改密码（已登录的情况）
     @PutMapping("/password")
     public Result updatePassword(@RequestBody Map<String, String> params, @RequestAttribute Integer userId) {
         String oldPassword = params.get("oldPassword");
@@ -230,6 +231,50 @@ public class AuthController {
             return Result.error(401, "旧密码错误");
         }
         userMapper.updatePassword(userId, passwordEncoder.encode(newPassword));
+        return Result.success();
+    }
+
+    // 发送重置密码验证码（忘记密码）
+    @PostMapping("/sendResetCaptcha")
+    public Result sendResetCaptcha(@RequestParam String email) {
+        // 生成验证码
+        String captcha = String.valueOf((int) ((Math.random() * 9 + 1) * 100000));
+        // 保存验证码到redis
+        redisTemplate.opsForValue().set("CAPTCHA:reset:" + email, captcha, 5, TimeUnit.MINUTES);
+        // 发送邮件
+        mailService.sendResetCaptchaMail(email, captcha);
+        // 返回结果
+        return Result.success();
+    }
+
+    // 重置密码
+    @PutMapping("/reset")
+    public Result updatePassword(@RequestBody UserResetPwdDto resetDto) {
+        String email = resetDto.getEmail();
+        String userInputCode = resetDto.getCaptcha();
+        // 从redis中获取保存的验证码
+        String realCode = redisTemplate.opsForValue().get("CAPTCHA:reset:" + email);
+        // 校验用户是否存在（未来封装到Service里）
+        if (userMapper.findByEmail(resetDto.getEmail()) == null) {
+            return Result.error("用户不存在");
+        }
+        // 根据邮箱获取用户信息
+        User user = userMapper.findByEmail(email);
+        // 校验验证码是否有效
+        if (realCode == null) {
+            return Result.error("验证码已失效，请重新获取");
+        }
+        // 校验验证码是否正确
+        if (!realCode.equals(userInputCode)) {
+            return Result.error("验证码错误");
+        }
+        // 将明文密码加密
+        String encodedPassword = passwordEncoder.encode(resetDto.getPassword());
+        // 保存新密码到数据库
+        userMapper.updatePassword(user.getId(), encodedPassword);
+        // 删除 Redis 中的验证码
+        redisTemplate.delete("CAPTCHA:reset:" + email);
+        // 返回结果
         return Result.success();
     }
 }
