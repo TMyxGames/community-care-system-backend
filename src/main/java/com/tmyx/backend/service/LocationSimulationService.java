@@ -108,7 +108,7 @@ public class LocationSimulationService {
             formattedData.put(k.toString(), dto);
             // 执行监控方法
             securityService.monitorElderLocation(userId, dto.getLng(), dto.getLat());
-            System.out.println("用户" + userId + "经纬度：" + dto.getLng() + "," + dto.getLat());
+//            System.out.println("用户" + userId + "经纬度：" + dto.getLng() + "," + dto.getLat());
         });
 
         if (!formattedData.isEmpty()) {

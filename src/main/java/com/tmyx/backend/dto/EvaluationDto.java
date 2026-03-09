@@ -15,7 +15,7 @@ public class EvaluationDto {
     private Integer staffRate;
     private Date createTime;
 
-    private String userName;
+    private String username;
     private String avatarUrl;
 
     public Integer getId() {
@@ -82,12 +82,12 @@ public class EvaluationDto {
         this.createTime = createTime;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getAvatarUrl() {
@@ -109,7 +109,7 @@ public class EvaluationDto {
                 ", serviceRate=" + serviceRate +
                 ", staffRate=" + staffRate +
                 ", createTime=" + createTime +
-                ", userName='" + userName + '\'' +
+                ", username='" + username + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 '}';
     }

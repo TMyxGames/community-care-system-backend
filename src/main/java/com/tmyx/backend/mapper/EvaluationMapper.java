@@ -25,7 +25,7 @@ public interface EvaluationMapper {
             "e.content, " +
             "e.service_rate as serviceRate, " +
             "e.create_time as createTime, " +
-            "u.username as username, " +
+            "u.username, " +
             "u.avatar_url as avatarUrl " +
             "from evaluation e " +
             "left join user u on e.user_id = u.id " +

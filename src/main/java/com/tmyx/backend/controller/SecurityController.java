@@ -2,10 +2,13 @@ package com.tmyx.backend.controller;
 
 
 import com.tmyx.backend.common.Result;
+import com.tmyx.backend.dto.CallDto;
+import com.tmyx.backend.dto.UserBindDto;
 import com.tmyx.backend.dto.UserInfoDto;
 import com.tmyx.backend.dto.WebSocketResult;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.handler.MessageHandler;
+import com.tmyx.backend.mapper.EmergencyCallMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.service.MailService;
 import com.tmyx.backend.service.SecurityService;
@@ -32,6 +35,8 @@ public class SecurityController {
     private SecurityService securityService;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+    @Autowired
+    private EmergencyCallMapper emergencyCallMapper;
 
     // 获取告警状态
     @GetMapping("/alarm-status/{elderId}")
@@ -111,5 +116,12 @@ public class SecurityController {
 
         securityService.clearAllAlarmStatus(elderId);
         return Result.success("告警状态已重置");
+    }
+
+    // 获取紧急呼叫记录
+    @GetMapping("/call/all")
+    public Result getAllCalls(@RequestAttribute Integer userId) {
+        List<CallDto> calls = emergencyCallMapper.findEmergencyCallsByUserId(userId);
+        return Result.success(calls);
     }
 }
