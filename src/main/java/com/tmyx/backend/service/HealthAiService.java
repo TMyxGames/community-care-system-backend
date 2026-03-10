@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class HealthAiService {
-    @Value("${deepseek.api.key}") // 在 application.yml 中配置 key
+    @Value("${deepseek.api.key}") // 配置API Key
     private String apiKey;
 
     private final String API_URL = "https://api.deepseek.com/chat/completions";
@@ -23,7 +23,7 @@ public class HealthAiService {
             .build();
 
     public String getHealthAdvice(String prompt) throws IOException {
-        // 构建请求 JSON (使用 Fastjson 语法)
+        // 构建请求json
         JSONObject root = new JSONObject();
         root.put("model", "deepseek-chat");
         root.put("stream", false);
@@ -42,7 +42,7 @@ public class HealthAiService {
 
         root.put("messages", messages);
 
-        // 构建 RequestBody (注意 OkHttp 4.x 语法)
+        // 构建请求体
         MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(root.toJSONString(), mediaType);
 

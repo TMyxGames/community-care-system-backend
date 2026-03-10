@@ -86,7 +86,7 @@ public class HealthController {
                 default:
                     return Result.error("未知的健康数据类型: " + request.getType());
             }
-            return Result.success("记录成功");
+            return Result.success("记录成功", null);
         } catch (Exception e) {
             return Result.error("数据库写入失败: " + e.getMessage());
         }
@@ -145,23 +145,22 @@ public class HealthController {
         return Result.success(trend);
     }
 
+    // 健康分析
     @GetMapping("/ai/advice")
     public Result getAiAdvice(@RequestParam("userId") Integer targetId,
                               @RequestAttribute Integer userId) {
         // 判断用户权限
         healthDataService.checkHealthDataPermission(userId, targetId);
-
         try {
-            // 2. 构造 Prompt
+            // 构造提示词
             String prompt = healthDataService.generateAiPrompt(targetId);
-
-            // 3. 调用 AI 服务
+            // 调用服务
             String advice = healthAiService.getHealthAdvice(prompt);
-
             return Result.success(advice);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(500, "AI 健康助手暂时掉线了，请稍后再试");
+            return Result.error(500, "AI暂时掉线了，请稍后再试");
         }
     }
+
 }

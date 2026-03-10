@@ -2,15 +2,14 @@ package com.tmyx.backend.service;
 
 import com.tmyx.backend.dto.WebSocketResult;
 import com.tmyx.backend.entity.Message;
+import com.tmyx.backend.entity.SafeArea;
 import com.tmyx.backend.entity.Session;
 import com.tmyx.backend.dto.UserBindDto;
 import com.tmyx.backend.handler.MessageHandler;
-import com.tmyx.backend.mapper.MessageMapper;
-import com.tmyx.backend.mapper.SessionMapper;
-import com.tmyx.backend.mapper.SystemNoticeMapper;
-import com.tmyx.backend.mapper.UserMapper;
+import com.tmyx.backend.mapper.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -31,9 +30,15 @@ public class MessageService {
     @Autowired
     private UserService userService;
     @Autowired
+    private SecurityService securityService;
+    @Autowired
     private SystemNoticeMapper systemNoticeMapper;
     @Autowired
     private MessageHandler messageHandler;
+    @Autowired
+    private AreaMapper areaMapper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     // 获取会话的消息记录
     public List<?> getMessagesBySession(Integer sessionId, Integer userId) {
@@ -90,8 +95,7 @@ public class MessageService {
         // 获取发送者的信息
         UserBindDto senderInfo = userService.getUserBindDto(fromId);
         msg.setOtherUser(senderInfo);
-
-        // 给接收者实时提醒
+        // 发送ws消息给接收者实时提醒
         WebSocketResult<Message> msgResult = WebSocketResult.build("bind_request", msg);
         messageHandler.sendMessageToUser(toId, msgResult);
     }
@@ -99,9 +103,8 @@ public class MessageService {
     // 处理绑定请求
     @Transactional
     public void handleBindRequest(Integer messageId, Integer status, Integer currentUserId) {
-        // 查询消息并校验
+        // 查询消息详情并校验
         Message msg = messageMapper.findById(messageId);
-        System.out.println(msg);
         if (msg == null || !msg.getToId().equals(currentUserId)) {
             throw new RuntimeException("消息不存在或无权访问");
         }
@@ -111,10 +114,11 @@ public class MessageService {
         // 更新消息状态（0: 未处理, 1: 同意, 2: 拒绝)
         messageMapper.updateStatus(messageId, status);
         msg.setStatus(status);
+        // 获取发送者和接收者的信息
+        Integer fromId = msg.getFromId();
+        Integer toId = msg.getToId();
         // 如果同意，则调用UserMapper进行绑定
         if (status == 1) {
-            Integer fromId = msg.getFromId(); // 发送者id
-            Integer toId = msg.getToId(); // 接收者id
             Integer relation = Integer.parseInt(msg.getContent()); // 关系（将字符串转换为数字)
             // 判断是否已绑定
             if (userMapper.countBinding(fromId, toId) == 0) {
@@ -141,12 +145,35 @@ public class MessageService {
                 }
             });
         }
+        // 获取家属设定的安全区域
+        List<SafeArea> areas = areaMapper.findSafeAreaByUserId(fromId);
+        if (areas != null && !areas.isEmpty()) {
+            for (SafeArea area : areas) {
+                // 将安全区域添加到老人的redis set中
+                redisTemplate.opsForSet().add("elder:areas:" + toId, area.getId().toString());
+                // 更新安全区域缓存
+                redisTemplate.opsForHash().put("area:cache:safe", area.getId().toString(), area.getRegion());
+            }
+            // 初始清理
+            securityService.clearRedisAlarmStatus(toId);
+        }
 
     }
 
     // 处理解绑
     @Transactional
     public void handleUnbind(Integer currentUserId, Integer targetId) {
+        // 判断双方的身份
+        Integer bindingId = userMapper.findBindingId(currentUserId, targetId);
+        Integer followerId;
+        Integer elderId;
+        if (bindingId != null) {
+            followerId = currentUserId;
+            elderId = targetId;
+        } else {
+            followerId = targetId;
+            elderId = currentUserId;
+        }
         // 获取双方的绑定请求会话id（type=1 绑定请求）
         Session fromSession = sessionMapper.findByUserAndType(currentUserId, 1);
         Session toSession = sessionMapper.findByUserAndType(targetId, 1);
@@ -187,6 +214,16 @@ public class MessageService {
                 }
             });
         }
+        // 清除redis中的关联安全区域数据（避免解绑后因为无效数据触发告警）
+        List<SafeArea> areas = areaMapper.findSafeAreaByUserId(followerId);
+        if (areas != null && !areas.isEmpty()) {
+            for (SafeArea area : areas) {
+                // 从该老人的redis set中移除该家属的安全区域id
+                redisTemplate.opsForSet().remove("elder:areas:" + elderId, area.getId().toString());
+            }
+        }
+        // 清除老人的告警状态
+        securityService.clearRedisAlarmStatus(elderId);
     }
 
     // 拷贝消息（给处理绑定请求方法使用）

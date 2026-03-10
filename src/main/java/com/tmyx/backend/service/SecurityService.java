@@ -48,6 +48,7 @@ public class SecurityService {
 
     // 安全总控方法
     public void monitorElderLocation(Integer userId, double lng, double lat) {
+        // 获取关联的安全区域
         List<String> wkts = redisLocationService.getElderAllSafeAreaWkt(userId);
         if (wkts.isEmpty()) return;
         // 检查老人位置是否位于某个关联的安全范围内
@@ -112,7 +113,6 @@ public class SecurityService {
 
     }
 
-
     // 检查位置是否在范围内
     public boolean checkInArea(double lng, double lat, String wktPolygon) {
         if (wktPolygon == null || wktPolygon.isEmpty()) return true;
@@ -127,6 +127,8 @@ public class SecurityService {
             return true; // 发生异常时默认不告警，防止误报
         }
     }
+
+    // 检查合法性
 
     // 处理安全告警
     public Map<String, Object> processSafetyAlarm(Integer userId) {
@@ -243,7 +245,7 @@ public class SecurityService {
     }
 
     // 通用的推送清理消息方法
-    private void sendClearAlarmSocket(Integer elderId, String actionType, Integer minutes) {
+    public void sendClearAlarmSocket(Integer elderId, String actionType, Integer minutes) {
         // 构造ws消息
         Map<String, Object> wsData = new HashMap<>();
         wsData.put("elderId", elderId);
@@ -278,10 +280,22 @@ public class SecurityService {
     // 挂断紧急通话后重置告警状态
     public void clearAllAlarmStatus(Integer elderId) {
         // 删除redis里所有相关的key
+        redisTemplate.delete("out_count:" + elderId);
         redisTemplate.delete("alarm_count:" + elderId);
         redisTemplate.delete("last_alarm_time:" + elderId);
+        redisTemplate.delete("silence_mode:" + elderId);
 
         sendClearAlarmSocket(elderId, "hangup", 0);
+    }
+
+    // 极端情况下如果告警时解绑了，则清除所有告警状态
+    public void clearRedisAlarmStatus(Integer elderId) {
+        // 删除redis里所有相关的key
+        redisTemplate.delete("out_count:" + elderId);
+        redisTemplate.delete("alarm_count:" + elderId);
+        redisTemplate.delete("silence_mode:" + elderId);
+        redisTemplate.delete("last_alarm_time:" + elderId);
+        sendClearAlarmSocket(elderId, "system_reset", 0);
     }
 
 }

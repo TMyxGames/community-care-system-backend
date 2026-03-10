@@ -41,8 +41,8 @@ public class DataInitializer implements ApplicationRunner {
 
 //            List<LocationDto> userLocations = locationMapper.findAllUserLocations();
 //            preheatLocations("user", userLocations);
-            LocationDto userLocation = locationMapper.findLocationByUserId(37);
-            preheatLocation("user", userLocation);
+//            LocationDto userLocation = locationMapper.findLocationByUserId(37);
+//            preheatLocation("user", userLocation);
 
             preheatSafeAreas();
         } catch (Exception e) {

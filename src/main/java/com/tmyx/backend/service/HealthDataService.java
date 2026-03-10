@@ -88,7 +88,7 @@ public class HealthDataService {
         return summary;
     }
 
-    // 构造AI提示词
+    // 构造提示词
     public String generateAiPrompt(Integer targetId) {
         UserHealthVo summary = this.getAllHealthData(targetId);
 

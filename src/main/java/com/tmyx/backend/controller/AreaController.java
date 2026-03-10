@@ -1,13 +1,16 @@
 package com.tmyx.backend.controller;
 
+import com.tmyx.backend.dto.UserBindDto;
 import com.tmyx.backend.entity.SafeArea;
 import com.tmyx.backend.entity.ServiceArea;
 import com.tmyx.backend.entity.User;
 import com.tmyx.backend.mapper.AreaMapper;
 import com.tmyx.backend.mapper.UserMapper;
 import com.tmyx.backend.common.Result;
+import com.tmyx.backend.service.SecurityService;
 import com.tmyx.backend.util.GeometryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,17 +23,21 @@ public class AreaController {
     private AreaMapper areaMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private SecurityService securityService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     // 获取所有服务区域
     @GetMapping("/service/all")
-    public Result getAllServiceArea() {
+    public Result getAllServiceArea(@RequestAttribute Integer userId) {
         List<ServiceArea> areas = areaMapper.findAllServiceArea();
         return Result.success(areas);
     }
 
     // 添加服务区域
     @PostMapping("/service/add")
-    public String addServiceArea(@RequestBody ServiceArea area) {
+    public String addServiceArea(@RequestBody ServiceArea area, @RequestAttribute Integer userId) {
         String region = GeometryUtil.parseScopePathToWkt(area.getScopePath());
         area.setRegion(region);
 
@@ -44,7 +51,7 @@ public class AreaController {
 
     // 删除服务区域
     @DeleteMapping("/service/delete/{id}")
-    public String removeServiceArea(@PathVariable Integer id) {
+    public String removeServiceArea(@PathVariable Integer id, @RequestAttribute Integer userId) {
         int result = areaMapper.deleteServiceArea(id);
         if (result > 0) {
             return "删除成功";
@@ -70,29 +77,73 @@ public class AreaController {
         }
     }
 
-    // 添加服务区域
+    // 添加安全区域
     @PostMapping("/safe/add")
-    public String addSafeArea(@RequestBody SafeArea area) {
+    public Result addSafeArea(@RequestBody SafeArea area, @RequestAttribute Integer userId) {
+        // 设置家属id并转换为wkt
+        area.setUserId(userId);
         String region = GeometryUtil.parseScopePathToWkt(area.getScopePath());
         area.setRegion(region);
-
+        // 保存到数据库
         int result = areaMapper.insertSafeArea(area);
         if (result > 0) {
-            return "添加成功";
-        } else {
-            return "添加失败";
+            // 获取家属绑定的所有老人
+            List<UserBindDto> elders = userMapper.findEldersByFollowerId(userId);
+            for (UserBindDto elder : elders) {
+                // 在老人的安全区域列表中添加该安全区域
+                redisTemplate.opsForSet().add("elder:areas:" + elder.getId(), area.getId().toString());
+                // 清理老人的告警状态
+                securityService.clearRedisAlarmStatus(elder.getId());
+            }
+            // 更新安全区域缓存
+            redisTemplate.opsForHash().put("area:cache:safe", area.getId().toString(), region);
+            return Result.success("安全区域添加成功", null);
         }
+
+        return Result.success("安全区域添加失败", null);
     }
 
     // 删除安全区域
     @DeleteMapping("/safe/delete/{id}")
-    public String removeSafeArea(@PathVariable Integer id) {
+    public Result removeSafeArea(@PathVariable Integer id, @RequestAttribute Integer userId) {
+        // 获取安全区域详情
+        SafeArea area = areaMapper.findSafeAreaById(id);
+        if (area == null) {
+            return Result.error("安全区域不存在");
+        }
+        // 根据安全区域的创建者（家属）id查找该家属绑定的所有老人
+        List<UserBindDto> elders = userMapper.findEldersByFollowerId(area.getUserId());
+        // 权限判定
+        boolean hasPermission = false;
+        // 操作者要么是创建者本人，要么是和老人中至少有一个绑定关系的家属
+        if (area.getUserId().equals(userId)) {
+            hasPermission = true;
+        } else {
+            for (UserBindDto elder : elders) {
+                if (userMapper.countBinding(userId, elder.getId()) > 0) {
+                    hasPermission = true;
+                    break;
+                }
+            }
+        }
+        if (!hasPermission) {
+            return Result.error("您无权删除该安全区域");
+        }
+        // 删除数据库中的安全区域
         int result = areaMapper.deleteSafeArea(id);
         if (result > 0) {
-            return "删除成功";
-        } else {
-            return "删除失败";
+            for (UserBindDto elder : elders) {
+                // 在老人的安全区域列表中删除该安全区域
+                redisTemplate.opsForSet().remove("elder:areas:" + elder.getId(), id.toString());
+                // 清理老人的告警状态
+                securityService.clearRedisAlarmStatus(elder.getId());
+            }
+            redisTemplate.opsForHash().delete("area:cache:safe", id.toString());
+            return Result.success("删除成功");
         }
+
+        return Result.error("删除失败");
     }
+
 
 }

@@ -120,8 +120,13 @@ public class SecurityController {
 
     // 获取紧急呼叫记录
     @GetMapping("/call/all")
-    public Result getAllCalls(@RequestAttribute Integer userId) {
-        List<CallDto> calls = emergencyCallMapper.findEmergencyCallsByUserId(userId);
-        return Result.success(calls);
+    public Result getAllCalls(@RequestParam Integer role, @RequestAttribute Integer userId) {
+        if (role == 3) {
+            List<CallDto> calls = emergencyCallMapper.findEmergencyCallsByElderId(userId);
+            return Result.success(calls);
+        } else {
+            List<CallDto> calls = emergencyCallMapper.findEmergencyCallsByUserId(userId);
+            return Result.success(calls);
+        }
     }
 }

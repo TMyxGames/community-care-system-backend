@@ -68,7 +68,8 @@ public interface UserMapper {
     public int delete(Integer id);
 
     // 更新基础账户数据
-    @Update("update user set username=#{username}, real_name=#{realName}, sex=#{sex} where id = #{id}")
+    @Update("update user set username=#{username}, real_name=#{realName}, " +
+            "birthday=#{birthday}, sex=#{sex} where id = #{id}")
     public int updateBaseInfo(User user);
 
     // 更新密码
@@ -103,19 +104,29 @@ public interface UserMapper {
     // 添加用户绑定关系
     @Insert("insert into binding(follower_id, elder_id, relation, remark) " +
             "values(#{followerId}, #{elderId}, #{relation}, #{remark})")
-    int insertBinding(@Param("followerId") int followerId,
-                      @Param("elderId") int elderId,
-                      @Param("relation") int relation,
+    int insertBinding(@Param("followerId") Integer followerId,
+                      @Param("elderId") Integer elderId,
+                      @Param("relation") Integer relation,
                       @Param("remark") String remark);
 
     // 删除用户绑定关系（解绑）
     @Delete("delete from binding where follower_id = #{followerId} and elder_id = #{elderId} " +
                                 "or follower_id = #{elderId} and elder_id = #{followerId}")
-    int deleteBinding(@Param("followerId") int followerId, @Param("elderId") int elderId);
+    int deleteBinding(@Param("followerId") Integer followerId, @Param("elderId") Integer elderId);
 
     // 检查是否已存在绑定关系
     @Select("select count(*) from binding where follower_id = #{followerId} and elder_id = #{elderId}")
-    int countBinding(@Param("followerId") int followerId, @Param("elderId") int elderId);
+    int countBinding(@Param("followerId") Integer followerId, @Param("elderId") Integer elderId);
+
+    // 根据双方的id查询绑定关系的id
+    @Select("select id from binding where follower_id = #{followerId} and elder_id = #{elderId}")
+    Integer findBindingId(@Param("followerId") Integer followerId, @Param("elderId") Integer elderId);
+
+    // 检查是否存在绑定关系，并且绑定的所有家属里至少存在一个安全区域（告警校验时使用）
+//    @Select("select count(*) from binding b " +
+//            "join safe_area s on b.follower_id = s.user_id " +
+//            "where b.elder_id = #{elderId}")
+//    int countValidMonitoringConfig(@Param("elderId") int elderId);
 
     // ============================== 服务人员 ==============================
     // 更新服务人员工作区域（参数来自UserService）

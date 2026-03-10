@@ -47,18 +47,21 @@ public class MessageController {
 
     // 发送绑定请求
     @PostMapping("/bind/send")
-    public Result sendBindRequest(@RequestAttribute Integer userId, @RequestParam Integer toId, @RequestParam Integer relation) {
+    public Result sendBindRequest(@RequestAttribute Integer userId,
+                                  @RequestParam Integer toId,
+                                  @RequestParam Integer relation) {
+
         User currentUser = userMapper.findById(userId); // 发送者
         User targetUser = userMapper.findById(toId); // 接收者
         // 不能绑定自己
         if (userId.equals(toId)) {
             return Result.error(400, "您不能与自己绑定");
         }
-        // 如果发送者身份为老人
+        // 如果发送者身份为老人（冗余）
         if (currentUser.getRole() == 3) {
             return Result.error(403, "您无权发送绑定请求");
         }
-        // 如果接收者身份不为老人
+        // 如果接收者身份不为老人（冗余）
         if (targetUser.getRole() != 3) {
             return Result.error(400, "您只能向老人发送绑定请求");
         }
@@ -66,9 +69,10 @@ public class MessageController {
         if (userMapper.countBinding(userId, toId) > 0) {
             return Result.error(400, "您已经和该用户绑定过了");
         }
+        // 发送绑定请求
         messageService.sendBindingRequest(userId, toId, relation);
 
-        return Result.success();
+        return Result.success("绑定请求已发送", null);
     }
 
     // 处理绑定请求

@@ -14,6 +14,16 @@ public class Result<T> {
         return build(200, "操作成功", data);
     }
 
+    // 不带数据的成功
+    public static <T> Result<T> success() {
+        return build(200, "操作成功", null);
+    }
+
+    // 自定义成功
+    public static <T> Result<T> success(String msg, T data) {
+        return build(200, msg, data);
+    }
+
     // 默认失败
     public static <T> Result<T> error(String msg) {
         return build(500, msg, null);
@@ -26,11 +36,6 @@ public class Result<T> {
         result.setMsg(msg);
         result.setData(data);
         return result;
-    }
-
-    // 不带数据的成功
-    public static <T> Result<T> success() {
-        return build(200, "操作成功", null);
     }
 
     // 401, 403...

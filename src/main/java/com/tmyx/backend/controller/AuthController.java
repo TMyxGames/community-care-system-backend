@@ -64,46 +64,50 @@ public class AuthController {
     // 用户注册
     @PostMapping("/register")
     public Result register(@RequestBody UserRegiDto regiDto) {
+        // 从DTO中获取注册信息
+        String username = regiDto.getUsername();
         String email = regiDto.getEmail();
         String userInputCode = regiDto.getCaptcha();
-        // 从redis中获取保存的验证码
+        Integer role = regiDto.getRole() != null ? regiDto.getRole() : 0;
+        // 从redis中获取验证码
         String realCode = redisTemplate.opsForValue().get("CAPTCHA:regi:" + email);
-        // 校验用户是否存在（未来封装到Service里）
-        if (userMapper.findByName(regiDto.getUsername()) != null) {
-            return Result.error("用户名已存在");
-        }
-        // 校验验证码是否有效
+        // 检查验证码是否有效
         if (realCode == null) {
             return Result.error("验证码已失效，请重新获取");
         }
-        // 校验验证码是否正确
+        // 检查验证码是否正确
         if (!realCode.equals(userInputCode)) {
             return Result.error("验证码错误");
         }
+        // 检查用户是否存在
+        if (userMapper.findByEmail(email) != null) {
+            return Result.error("该用户已注册");
+        }
         // 将明文密码加密
         String encodedPassword = passwordEncoder.encode(regiDto.getPassword());
-        // 保存用户信息到数据库
+        // 构造用户信息并保存到数据库
         User user = new User();
-        user.setUsername(regiDto.getUsername());
+        user.setUsername(username);
         user.setPassword(encodedPassword);
-        user.setEmail(regiDto.getEmail());
-        user.setRole(regiDto.getRole() != null ? regiDto.getRole() : 0);
+        user.setEmail(email);
+        user.setRole(role);
         userMapper.insert(user);
         // 初始化站内信会话
         sessionService.initDefaultSessions(user.getId());
-        // 上传默认头像
+        // 初始化默认头像
         userService.setDefaultAvatar(user.getId());
-        // 删除 Redis 中的验证码
+        // 删除redis中的验证码
         redisTemplate.delete("CAPTCHA:regi:" + email);
         // 返回结果
-        return Result.success();
+        return Result.success("注册成功", null);
     }
 
     // 用户登录
     @PostMapping("/login")
     public Result login(@RequestBody UserLoginDto loginDto) {
+        // 通过邮箱获取用户信息
         User user = userMapper.findByEmail(loginDto.getEmail());
-        // 校验用户是否存在
+        // 检查用户是否存在
         if (user == null) {
             return Result.error(401, "用户不存在");
         }
@@ -142,7 +146,7 @@ public class AuthController {
                     return Result.error(403, "该账号身份为“老人”，请选择“老人”身份登录");
                 }
             } else {
-                // 必须与数据库身份完全一致
+                // 必须与保存的身份完全一致
                 if (!actualRole.equals(requestedRole)) {
                     String roleName = "";
                     switch (requestedRole) {
@@ -161,7 +165,7 @@ public class AuthController {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("token", token);
         responseData.put("userInfo", user);
-        return Result.success(responseData);
+        return Result.success("登录成功", responseData);
     }
 
     // 获取绑定数据
@@ -215,7 +219,7 @@ public class AuthController {
         if (result > 0) {
             User updatedUser = userMapper.findById(user.getId());
             updatedUser.setPassword(null);
-            return Result.success(updatedUser);
+            return Result.success("更新用户信息成功", updatedUser);
         }
         return Result.error("更新用户信息失败");
     }
@@ -225,13 +229,18 @@ public class AuthController {
     public Result updatePassword(@RequestBody Map<String, String> params, @RequestAttribute Integer userId) {
         String oldPassword = params.get("oldPassword");
         String newPassword = params.get("newPassword");
-        // 查询用户信息，校验旧密码是否正确
+        // 查询用户信息，检查旧密码是否正确
         User user = userMapper.findById(userId);
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             return Result.error(401, "旧密码错误");
         }
+        // 检查新密码是否与旧密码重复
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            return Result.error(401, "新密码不能与旧密码相同");
+        }
+        // 将密码进行加密并保存到数据库
         userMapper.updatePassword(userId, passwordEncoder.encode(newPassword));
-        return Result.success();
+        return Result.success("密码修改成功", null);
     }
 
     // 发送重置密码验证码（忘记密码）
@@ -249,22 +258,23 @@ public class AuthController {
 
     // 重置密码
     @PutMapping("/reset")
-    public Result updatePassword(@RequestBody UserResetPwdDto resetDto) {
+    public Result resetPassword(@RequestBody UserResetPwdDto resetDto) {
+        // 从DTO中获取用户输入的邮箱和验证码
         String email = resetDto.getEmail();
         String userInputCode = resetDto.getCaptcha();
         // 从redis中获取保存的验证码
         String realCode = redisTemplate.opsForValue().get("CAPTCHA:reset:" + email);
-        // 校验用户是否存在（未来封装到Service里）
+        // 检查用户是否存在
         if (userMapper.findByEmail(resetDto.getEmail()) == null) {
             return Result.error("用户不存在");
         }
         // 根据邮箱获取用户信息
         User user = userMapper.findByEmail(email);
-        // 校验验证码是否有效
+        // 检查验证码是否有效
         if (realCode == null) {
             return Result.error("验证码已失效，请重新获取");
         }
-        // 校验验证码是否正确
+        // 检查验证码是否正确
         if (!realCode.equals(userInputCode)) {
             return Result.error("验证码错误");
         }
@@ -272,9 +282,9 @@ public class AuthController {
         String encodedPassword = passwordEncoder.encode(resetDto.getPassword());
         // 保存新密码到数据库
         userMapper.updatePassword(user.getId(), encodedPassword);
-        // 删除 Redis 中的验证码
+        // 删除redis中的验证码
         redisTemplate.delete("CAPTCHA:reset:" + email);
         // 返回结果
-        return Result.success();
+        return Result.success("密码重置成功", null);
     }
 }

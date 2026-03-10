@@ -12,6 +12,7 @@ public interface AreaMapper {
     // 插入新安全区域
     @Insert("insert into safe_area(user_id, area_name, scope_path, region, center_lng, center_lat)" +
             "values(#{userId}, #{areaName}, #{scopePath}, ST_GeomFromText(#{region}), #{centerLng}, #{centerLat})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insertSafeArea(SafeArea safeArea);
 
     // 查询所有安全区域
@@ -19,8 +20,13 @@ public interface AreaMapper {
             "center_lng, center_lat, is_active from safe_area")
     public List<SafeArea> findAllSafeArea();
 
+    // 根据id查询安全区域
+    @Select("select * from safe_area where id= #{id}")
+    public SafeArea findSafeAreaById(Integer id);
+
     // 根据用户id查询安全区域（家属使用）
-    @Select("select * from safe_area where user_id= #{userId}")
+    @Select("select id, user_id, area_name, scope_path, ST_AsText(region) as region, " +
+            "center_lng, center_lat from safe_area where user_id= #{userId}")
     public List<SafeArea> findSafeAreaByUserId(Integer userId);
 
     // 根据用户id查询已绑定用户的安全区域（老人使用）
