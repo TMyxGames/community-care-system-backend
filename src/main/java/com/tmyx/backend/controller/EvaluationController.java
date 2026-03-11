@@ -29,7 +29,7 @@ public class EvaluationController {
         // 插入评价
         evaluation.setUserId(userId);
         evaluationMapper.insert(evaluation);
-        // 将订单状态设置为已评价（4）
+        // 更新订单状态为已评价（4）
         orderMapper.updateState(evaluation.getOrderId(), 4);
         return Result.success(evaluation);
     }

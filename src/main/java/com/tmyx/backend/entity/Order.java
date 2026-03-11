@@ -15,6 +15,7 @@ public class Order {
     private Double lng;
     private Double lat;
     private String addressShot;
+    private String phone;
     private LocalDateTime createTime;
     private LocalDateTime startTime;
     private LocalDateTime completeTime;
@@ -108,6 +109,14 @@ public class Order {
         this.addressShot = addressShot;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
@@ -154,6 +163,7 @@ public class Order {
                 ", lng=" + lng +
                 ", lat=" + lat +
                 ", addressShot='" + addressShot + '\'' +
+                ", phone='" + phone + '\'' +
                 ", createTime=" + createTime +
                 ", startTime=" + startTime +
                 ", completeTime=" + completeTime +

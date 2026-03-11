@@ -46,7 +46,7 @@ public class ArticleController {
     public Result preGenerateId() {
         // 生成文章id
         String articleId = UUID.randomUUID().toString().replace("-", "");
-
+        // 拼接文章保存路径
         String subPath = "/article/" + articleId + "/images/";
         File folder = new File(baseUploadPath + subPath);
 
@@ -111,7 +111,6 @@ public class ArticleController {
         } else {
             System.out.println("跳过文件写入");
         }
-
         // 组装文章信息
         article.setId(article.getId());
         article.setUpId(userId);

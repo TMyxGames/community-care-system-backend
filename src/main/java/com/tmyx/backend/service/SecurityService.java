@@ -59,13 +59,11 @@ public class SecurityService {
                 break;
             }
         }
-
         // 定义离开范围计次key、告警阶段key、上一次告警时间key、静默状态key
         String outCountKey = "out_count:" + userId;
         String alarmCountKey = "alarm_count:" + userId;
         String lastTimeKey = "last_alarm_time:" + userId;
         String silenceKey = "silence_mode:" + userId;
-
         // 判断安全
         if (isSafe) {
             // 无论是否处于静默状态，只要存在告警阶段且已回到安全区域，则发送平安邮件
@@ -78,12 +76,10 @@ public class SecurityService {
             redisTemplate.delete(outCountKey);
             return;
         }
-
         // 检查是否处于静默状态
         if (Boolean.TRUE.equals(redisTemplate.hasKey(silenceKey))) {
             return;
         }
-
         // 检查是否处于冷却时间（距离上一次告警未达到5分钟）
         Long lastTime = (Long) redisTemplate.opsForValue().get(lastTimeKey);
         boolean isCoolDown = lastTime != null && (System.currentTimeMillis() - lastTime) < 5 * 60 * 1000;
@@ -91,21 +87,19 @@ public class SecurityService {
         if (isCoolDown) {
             return;
         }
-
         // 检查是否处于告警状态（是否存在告警阶段）
         if (Boolean.TRUE.equals(redisTemplate.hasKey(alarmCountKey))) {
             // 若处于告警状态，则直接触发安全告警，不再走下面的累加计数流程
             processSafetyAlarm(userId);
             return;
         }
-
         // 不在安全区域时累加计数
         Long currentCount = redisTemplate.opsForValue().increment(outCountKey);
         // 设置过期时间，如果30秒内没收到新位置，则中断计次，清除计次
         redisTemplate.expire(outCountKey, 30, TimeUnit.SECONDS);
 
         System.out.println("老人[" + userId + "]离开安全区域，当前计数：" + currentCount);
-        // 当计次达到3次时，触发告警
+        // 当计次达到6次时，触发告警
         if (currentCount != null && currentCount == 6) {
             // 触发处理安全告警方法
             processSafetyAlarm(userId);
@@ -113,7 +107,7 @@ public class SecurityService {
 
     }
 
-    // 检查位置是否在范围内
+    // 检查位置是否在安全区域内
     public boolean checkInArea(double lng, double lat, String wktPolygon) {
         if (wktPolygon == null || wktPolygon.isEmpty()) return true;
 
@@ -128,19 +122,15 @@ public class SecurityService {
         }
     }
 
-    // 检查合法性
-
     // 处理安全告警
     public Map<String, Object> processSafetyAlarm(Integer userId) {
         // 更新上一次告警时间
         long currentTime = System.currentTimeMillis();
         String lastTimeKey = "last_alarm_time:" + userId;
         redisTemplate.opsForValue().set(lastTimeKey, currentTime, 15, TimeUnit.MINUTES);
-
         // 定义告警阶段计数key，增加告警阶段计数
         String alarmCountKey = "alarm_count:" + userId;
         Long count = redisTemplate.opsForValue().increment(alarmCountKey);
-
         // 构造ws消息
         Map<String, Object> wsData = new HashMap<>();
         wsData.put("stage", count.intValue());
@@ -165,7 +155,6 @@ public class SecurityService {
         redisTemplate.delete("alarm_count:" + userId);
         redisTemplate.delete("last_alarm_time:" + userId);
         redisTemplate.delete("silence_mode:" + userId);
-
         // 发送平安邮件
         sendSafetyEmails(userId);
     }

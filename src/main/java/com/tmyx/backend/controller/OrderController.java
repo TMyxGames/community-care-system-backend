@@ -87,21 +87,20 @@ public class OrderController {
         Order order = orderMapper.findById(orderId);
 
         if (order.getState() == 1 ) {
-            // 如果订单状态为1（待服务），则更新为2（服务中），并添加开始服务时间
+            // 如果订单状态为1（待服务），则更新为2（服务中），并插入开始服务时间
             orderMapper.updateState(orderId, 2);
             orderMapper.updateStartTime(orderId, LocalDateTime.now());
             // 更新服务人员状态为3（活动中）
             userMapper.updateServiceStatus(userId, 3);
             return Result.success();
         } else if (order.getState() == 2) {
-            // 如果订单状态为2（服务中），则更新为3（已完成），并添加完成服务时间
+            // 如果订单状态为2（服务中），则更新为3（已完成），并插入完成服务时间
             orderMapper.updateState(orderId, 3);
             orderMapper.updateCompleteTime(orderId, LocalDateTime.now());
             // 更新服务人员状态为1（空闲中）
             userMapper.updateServiceStatus(userId, 1);
             return Result.success();
         }
-
         return Result.error("订单状态错误");
     }
 

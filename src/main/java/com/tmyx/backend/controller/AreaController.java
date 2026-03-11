@@ -37,16 +37,18 @@ public class AreaController {
 
     // 添加服务区域
     @PostMapping("/service/add")
-    public String addServiceArea(@RequestBody ServiceArea area, @RequestAttribute Integer userId) {
+    public Result addServiceArea(@RequestBody ServiceArea area, @RequestAttribute Integer userId) {
+        // 设置管理员id并转换为wkt
+        area.setAdminId(userId);
         String region = GeometryUtil.parseScopePathToWkt(area.getScopePath());
         area.setRegion(region);
-
+        // 保存到数据库
         int result = areaMapper.insertServiceArea(area);
         if (result > 0) {
-            return "添加成功";
-        } else {
-            return "添加失败";
+            return Result.success("服务区域添加成功", null);
         }
+
+        return Result.error("服务区域添加失败");
     }
 
     // 删除服务区域
@@ -100,7 +102,7 @@ public class AreaController {
             return Result.success("安全区域添加成功", null);
         }
 
-        return Result.success("安全区域添加失败", null);
+        return Result.error("安全区域添加失败");
     }
 
     // 删除安全区域

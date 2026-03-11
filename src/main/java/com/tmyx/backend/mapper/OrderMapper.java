@@ -13,9 +13,9 @@ public interface OrderMapper {
     // 创建订单
     @Insert("insert into `order`(order_sn, user_id, staff_id," +
             "service_id, service_title, service_img, service_price, " +
-            "lng, lat, address_shot, create_time, start_time, complete_time, state) " +
+            "lng, lat, address_shot, phone, create_time, start_time, complete_time, state) " +
             "values (#{orderSn}, #{userId}, #{staffId}, #{serviceId}, #{serviceTitle}, " +
-            "#{serviceImg}, #{servicePrice}, #{lng}, #{lat}, #{addressShot}, " +
+            "#{serviceImg}, #{servicePrice}, #{lng}, #{lat}, #{addressShot}, #{phone}, " +
             "#{createTime}, #{startTime}, #{completeTime}, #{state})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     public int insertOrder(Order order);

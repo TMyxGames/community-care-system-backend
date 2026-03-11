@@ -9,13 +9,10 @@ public class Service {
     private String type;
     private String introduce;
     private String contentUrl;
-    private String provider;
     private String workTime;
-    private String location;
     private BigDecimal price;
     private int total;
     private String imgUrl;
-    private String link;
 
     public int getId() {
         return id;
@@ -61,26 +58,12 @@ public class Service {
 
     public void setContentUrl(String contentUrl) { this.contentUrl = contentUrl; }
 
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
     public String getWorkTime() {
         return workTime;
     }
 
     public void setWorkTime(String workTime) {
         this.workTime = workTime;
-    }
-
-    public String getLocation() { return location; }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public BigDecimal getPrice() {
@@ -103,14 +86,6 @@ public class Service {
         this.imgUrl = imgUrl;
     }
 
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
-    }
-
     @Override
     public String toString() {
         return "Service{" +
@@ -120,13 +95,10 @@ public class Service {
                 ", type='" + type + '\'' +
                 ", introduce='" + introduce + '\'' +
                 ", contentUrl='" + contentUrl + '\'' +
-                ", provider='" + provider + '\'' +
                 ", workTime='" + workTime + '\'' +
-                ", location='" + location + '\'' +
                 ", price='" + price + '\'' +
                 ", total='" + total + '\'' +
                 ", imgUrl='" + imgUrl + '\'' +
-                ", link='" + link + '\'' +
                 '}';
     }
 }

@@ -38,8 +38,7 @@ public class DispatchService {
         Double orderLng = order.getLng();
         Double orderLat = order.getLat();
         Integer serviceId = order.getServiceId();
-
-        // 构造坐标点的WKT格式
+        // 构造坐标点的wkt格式
         String pointWkt = String.format("POINT(%f %f)", orderLng, orderLat);
         // 匹配服务区域
         ServiceArea area = areaMapper.findAreaByLngLat(pointWkt);
@@ -49,12 +48,11 @@ public class DispatchService {
             return;
         }
         // 寻找候选服务人员
-        // 条件：同区域 + 角色是服务者 + 状态为空闲 + 具备对应业务技能
+        // 条件：同区域 + 角色是服务人员 + 状态为空闲 + 具备对应服务技能
         List<User> staffList = userMapper.findQualifiedStaffs(area.getId(), serviceId);
         if (staffList.isEmpty()) {
             return;
         }
-
         for (User staff : staffList) {
             String redisKey = "location:cache:staff" + staff.getId();
             // 获取 Redis中的数据
@@ -70,26 +68,21 @@ public class DispatchService {
                 }
             }
         }
-
         User bestStaff = staffList.stream()
                 .min((s1, s2) -> Double.compare(
                         calculateDistance(orderLng, orderLat, s1.getLng(), s1.getLat()),
                         calculateDistance(orderLng, orderLat, s2.getLng(), s2.getLat())
                 )).orElse(null);
-
         if (bestStaff != null) {
             // 绑定订单与人员
-//            String verifyCode = String.format("%04d", (int)(Math.random() * 10000));
             orderMapper.updateStaff(orderId, bestStaff.getId());
             // 更新订单状态为待服务(state=1)
             orderMapper.updateState(orderId, 1);
             // 更新人员状态为已接单(service_status=2)
             userMapper.updateServiceStatus(bestStaff.getId(), 2);
-            // 通过WebSocket实时推送订单消息
+            // 通过ws实时推送订单消息
             WebSocketResult<Integer> result = WebSocketResult.build("new_order", orderId);
             messageHandler.sendMessageToUser(bestStaff.getId(), result);
-
-            System.out.println("成功指派服务员：" + bestStaff.getUsername());
         }
     }
 
@@ -98,3 +91,5 @@ public class DispatchService {
         return Math.sqrt(Math.pow(lng1 - lng2, 2) + Math.pow(lat1 - lat2, 2));
     }
 }
+
+

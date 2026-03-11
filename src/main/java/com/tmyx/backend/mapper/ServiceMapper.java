@@ -21,20 +21,19 @@ public interface ServiceMapper {
     public Service findById(int id);
 
     // 插入服务数据
-    @Insert("insert into service(sort_order, title, type," +
-            "introduce, content_url, provider, work_time," +
-            " location, price, total, img_url, link)" +
-            "values(#{sortOrder}, #{title}, #{type}," +
-            "#{introduce}, #{contentUrl}, #{provider}, #{workTime}," +
-            " #{location}, #{price}, #{total}, #{imgUrl}, #{link})")
+    @Insert("insert into service(sort_order, title, type, " +
+            "introduce, content_url, work_time, price, total, img_url)" +
+            "values(#{sortOrder}, #{title}, #{type}, " +
+            "#{introduce}, #{contentUrl}, #{workTime}, " +
+            "#{price}, #{total}, #{imgUrl}")
     public int insert(Service service);
 
     // 更新服务数据
     @Update("update service set " +
-            "sort_order=#{sortOrder}, title=#{title}, type=#{type}," +
-            "introduce=#{introduce}, content_url=#{contentUrl}, provider=#{provider}," +
-            "work_time=#{workTime}, location=#{location}, price=#{price}, total=#{total}," +
-            "img_url=#{imgUrl}, link=#{link} where id=#{id}")
+            "sort_order=#{sortOrder}, title=#{title}, type=#{type}, " +
+            "introduce=#{introduce}, content_url=#{contentUrl}, " +
+            "work_time=#{workTime}, price=#{price}, total=#{total}," +
+            "img_url=#{imgUrl} where id=#{id}")
     public int update(Service service);
 
     // 删除服务数据

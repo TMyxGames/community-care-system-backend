@@ -97,7 +97,7 @@ public class LocationSimulationService {
 
     @Scheduled(fixedRate = 5000)
     public void pushUserLocations() {
-        // 从redis获取所有用户的实时位置
+        // 从redis获取所有用户的实时位置数据
         String key = "location:cache:user";
         Map<Object, Object> rawData = redisTemplate.opsForHash().entries(key);
         Map<String, LocationDto> formattedData = new HashMap<>();
@@ -106,22 +106,18 @@ public class LocationSimulationService {
             LocationDto dto = JSON.parseObject(v.toString(), LocationDto.class);
             Integer userId = Integer.parseInt(k.toString());
             formattedData.put(k.toString(), dto);
-            // 执行监控方法
+            // 执行安全校验总控方法
             securityService.monitorElderLocation(userId, dto.getLng(), dto.getLat());
-//            System.out.println("用户" + userId + "经纬度：" + dto.getLng() + "," + dto.getLat());
         });
 
         if (!formattedData.isEmpty()) {
-            // 封装成统一的消息格式
+            // 构造消息
             Map<String, Object> message = new HashMap<>();
             message.put("type", "user_update");
             message.put("data", formattedData);
-
-            // 序列化并调用 Handler 进行广播
+            // 推送消息
             String jsonString = JSON.toJSONString(message, SerializerFeature.WriteNonStringKeyAsString);
             LocationHandler.broadcastLocation(jsonString);
-
-            // System.out.println(">>> 已推送最新位置数据至前端");
         }
     }
 
