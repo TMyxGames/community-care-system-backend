@@ -187,23 +187,28 @@ public class AuthController {
 
     // 上传头像
     @PostMapping("/upload/avatar")
-    public String uploadImg(@RequestParam("file") MultipartFile file,
-                            @RequestParam("userId") Integer userId,
-                            @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
-
+    public String uploadImg(@RequestAttribute Integer userId,
+                            @RequestParam("file") MultipartFile file) throws IOException {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
+        // 获取旧文件url
+        String oldUrl = userMapper.findAvatarUrl(userId);
         // 保存新文件
         String subPath = "user/avatars/";
-        File uploadDir = new File(baseUploadPath, subPath);
+        File uploadDir = new File(baseDir, subPath);
+        // 如果目录不存在则创建
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         File dest = new File(uploadDir, fileName);
-        file.transferTo(dest);
+        file.transferTo(dest.getAbsoluteFile());
 
         // 删除旧的文件
         if (oldUrl != null && !oldUrl.isEmpty()) {
-            FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
+            FileUtil.checkAndDeleteFile(absolutePath, oldUrl);
         }
 
         String relativePath = "/files/" + subPath + fileName;

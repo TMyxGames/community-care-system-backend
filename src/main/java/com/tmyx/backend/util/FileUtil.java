@@ -28,8 +28,9 @@ public class FileUtil {
             } else if (pathOnly.startsWith("files/")) {
                 pathOnly = pathOnly.substring(6); // 如果不以斜杠开头那就去6个
             }
-
-            Path fullPath = Paths.get(baseUploadPath, pathOnly);
+            // 获取绝对路径
+            Path base = Paths.get(baseUploadPath).toAbsolutePath().normalize();
+            Path fullPath = base.resolve(pathOnly).normalize();
             File file = fullPath.toFile();
 
             System.out.println("尝试删除文件，物理路径为: " + file.getAbsolutePath());

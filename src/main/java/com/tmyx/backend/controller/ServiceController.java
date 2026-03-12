@@ -45,44 +45,55 @@ public class ServiceController {
 
     // 上传Markdown文件
     @PostMapping("/upload/markdown")
-    public Result uploadMarkdown(@RequestParam("file") MultipartFile file,
-                                 @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
+    public Result uploadMarkdown(@RequestParam("id") Integer id,
+                                 @RequestParam("file") MultipartFile file) throws IOException {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
+        // 获取旧文件url
+        String oldUrl = serviceMapper.findContentUrlById(id);
         // 保存新文件
         String subPath = "service/contents/";
-        File uploadDir = new File(baseUploadPath, subPath);
+        File uploadDir = new File(absolutePath, subPath);
+        // 如果目录不存在则创建
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         File dest = new File(uploadDir, fileName);
-        file.transferTo(dest);
+        file.transferTo(dest.getAbsoluteFile());
 
         // 删除旧的文件
         if (oldUrl != null && !oldUrl.isEmpty()) {
-            FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
+            FileUtil.checkAndDeleteFile(absolutePath, oldUrl);
         }
 
         return Result.success("/files/" + subPath + fileName);
     }
 
-    // 上传图片文件
+    // 上传图片文件1
     @PostMapping("/upload/img")
-    public Result uploadImg(@RequestParam("file") MultipartFile file,
-                            @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
-
+    public Result uploadImg(@RequestParam("id") Integer id,
+                            @RequestParam("file") MultipartFile file) throws IOException {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
+        // 获取旧文件url
+        String oldUrl = serviceMapper.findImgUrlById(id);
         // 保存新文件
         String subPath = "service/images/";
-        File uploadDir = new File(baseUploadPath, subPath);
+        File uploadDir = new File(absolutePath, subPath);
+        // 如果目录不存在则创建
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         File dest = new File(uploadDir, fileName);
-        file.transferTo(dest);
+        file.transferTo(dest.getAbsoluteFile());
 
         // 删除旧的文件
         if (oldUrl != null && !oldUrl.isEmpty()) {
-            FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
+            FileUtil.checkAndDeleteFile(absolutePath, oldUrl);
         }
 
         return Result.success("/files/" + subPath + fileName);
@@ -91,7 +102,10 @@ public class ServiceController {
     // 保存服务数据
     @PostMapping("/save")
     @Transactional
-    public String save(@RequestBody List<Service> services) {
+    public Result save(@RequestBody List<Service> services) {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
         // 获取数据库中现有的服务数据
         List<Service> oldList = serviceMapper.findAll();
 
@@ -110,12 +124,12 @@ public class ServiceController {
                 // 清理图片
                 long imgRefCount = services.stream().filter(s -> imgUrl != null && imgUrl.equals(s.getImgUrl())).count();
                 if (imgRefCount == 0) {
-                    FileUtil.checkAndDeleteFile(baseUploadPath, imgUrl);
+                    FileUtil.checkAndDeleteFile(absolutePath, imgUrl);
                 }
                 // 清理Markdown文件
                 long contentRefCount = services.stream().filter(s -> contentUrl != null && contentUrl.equals(s.getContentUrl())).count();
                 if (contentRefCount == 0) {
-                    FileUtil.checkAndDeleteFile(baseUploadPath, contentUrl);
+                    FileUtil.checkAndDeleteFile(absolutePath, contentUrl);
                 }
             }
         }
@@ -130,32 +144,7 @@ public class ServiceController {
                 serviceMapper.insert(s); // 没有ID时插入
             }
         }
-        return "服务数据保存成功";
+        return Result.success();
     }
 
-    // 删除硬盘上的文件（已弃用）
-//    private void checkAndDeleteFile(String fileUrl) {
-//        if (fileUrl == null || fileUrl.isEmpty()) return;
-//        try {
-//            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-//            String subDir = "";
-//
-//            if (fileUrl.contains("/images/")) {
-//                subDir = "service/images/";
-//            } else if (fileUrl.contains("/contents/")){
-//                subDir = "service/contents/";
-//            } else {
-//                return;
-//            }
-//
-//            File file = new File(baseUploadPath + subDir, fileName);
-//            if (file.exists()) {
-//                if(file.delete()) {
-//                    System.out.println("文件删除成功: " + file.getAbsolutePath());
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.err.println("文件删除异常: " + e.getMessage());
-//        }
-//    }
 }

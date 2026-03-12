@@ -1,32 +1,36 @@
 package com.tmyx.backend.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.math.BigDecimal;
 
 public class Service {
-    private int id;
-    private int sortOrder;
+    private Integer id;
+    private Integer sortOrder;
     private String title;
     private String type;
     private String introduce;
     private String contentUrl;
     private String workTime;
     private BigDecimal price;
-    private int total;
     private String imgUrl;
 
-    public int getId() {
+    @TableField(exist = false)
+    private Integer total;
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getSortOrder() {
+    public Integer getSortOrder() {
         return sortOrder;
     }
 
-    public void setSortOrder(int sortOrder) {
+    public void setSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
     }
 
@@ -74,9 +78,9 @@ public class Service {
         this.price = price;
     }
 
-    public int getTotal() { return total; }
+    public Integer getTotal() { return total; }
 
-    public void setTotal(int total) { this.total = total; }
+    public void setTotal(Integer total) { this.total = total; }
 
     public String getImgUrl() {
         return imgUrl;

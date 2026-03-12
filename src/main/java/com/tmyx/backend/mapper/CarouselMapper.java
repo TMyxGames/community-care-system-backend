@@ -23,6 +23,10 @@ public interface CarouselMapper {
             "values(#{title}, #{sortOrder}, #{imgUrl}, #{link})")
     public int insert(Carousel carousel);
 
+    // 根据id查询图片
+    @Select("select img_url from carousel where id=#{id}")
+    public String findImgUrlById(int id);
+
     // 删除轮播数据
     @Delete("delete from carousel where id=#{id}")
     public int delete(int id);

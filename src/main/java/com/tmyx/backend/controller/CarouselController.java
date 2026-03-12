@@ -38,22 +38,27 @@ public class CarouselController {
 
     // 上传图片文件
     @PostMapping("/upload/img")
-    public Result uploadImg(@RequestParam("file") MultipartFile file,
-                            @RequestParam(value = "oldUrl", required = false) String oldUrl) throws IOException {
-
+    public Result uploadImg(@RequestParam("id") Integer id,
+                            @RequestParam("file") MultipartFile file) throws IOException {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
+        // 获取旧文件url
+        String oldUrl = carouselMapper.findImgUrlById(id);
         // 保存新文件
         String subPath = "carousel/images/";
-        File uploadDir = new File(baseUploadPath, subPath);
+        File uploadDir = new File(baseDir, subPath);
+        // 如果目录不存在则创建
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         File dest = new File(uploadDir, fileName);
-        file.transferTo(dest);
-
+        file.transferTo(dest.getAbsoluteFile());
         // 删除旧的文件
         if (oldUrl != null && !oldUrl.isEmpty()) {
-            FileUtil.checkAndDeleteFile(baseUploadPath, oldUrl);
+            FileUtil.checkAndDeleteFile(absolutePath, oldUrl);
         }
 
         return Result.success("/files/" + subPath + fileName);
@@ -62,7 +67,10 @@ public class CarouselController {
     // 保存轮播数据
     @PostMapping("/save")
     @Transactional
-    public String save(@RequestBody List<Carousel> carousels) {
+    public Result save(@RequestBody List<Carousel> carousels) {
+        // 获取绝对路径
+        File baseDir = new File(baseUploadPath).getAbsoluteFile();
+        String absolutePath = baseDir.getAbsolutePath();
         // 获取数据库中现有的轮播数据
         List<Carousel> oldList = carouselMapper.findAll();
 
@@ -80,7 +88,7 @@ public class CarouselController {
                 // 清理图片
                 long imgRefCount = carousels.stream().filter(c -> imgUrl != null && imgUrl.equals(c.getImgUrl())).count();
                 if (imgRefCount == 0) {
-                    FileUtil.checkAndDeleteFile(baseUploadPath, imgUrl);
+                    FileUtil.checkAndDeleteFile(absolutePath, imgUrl);
                 }
             }
         }
@@ -95,23 +103,7 @@ public class CarouselController {
                 carouselMapper.insert(c); // 没有ID时插入
             }
         }
-        return "轮播数据保存成功";
+        return Result.success();
     }
 
-    // 删除硬盘上的文件（已弃用)
-//    private void checkAndDeleteFile(String imgUrl) {
-//        if (imgUrl == null || imgUrl.isEmpty()) return;
-//        try {
-//            // 从 URL 中提取文件名 (例如从 /images/carousel/xxx.jpg 提取 xxx.jpg)
-//            String fileName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
-//            String relativePath = baseUploadPath + "carousel/images/";
-//            File file = new File(relativePath, fileName);
-//            if (file.exists()) {
-//                file.delete();
-//                System.out.println("文件删除成功: " + fileName);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("文件删除失败: " + e.getMessage());
-//        }
-//    }
 }
